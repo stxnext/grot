@@ -23,7 +23,6 @@ class FieldWidget
         gray: '#95a5a6'
         blue: '#2980b9'
         green: '#27ae60'
-        yellow: '#e67e22'
         red: '#e74c3c'
 
     arrows:
@@ -102,8 +101,7 @@ class Field
         gray: 0
         blue: 1
         green: 2
-        yellow: 3
-        red: 4
+        red: 3
 
     constructor: (@board, @x, @y) ->
         @id = "#{@x}-#{@y}"
@@ -124,6 +122,7 @@ class Field
     updatePosition: (@x, @y) ->
         # update field position
         @id = "#{@x}-#{@y}"
+
 
 class Board
     # Grid of fields.
@@ -197,20 +196,160 @@ class Board
 
         return [newX, newY]
 
+
+class TopBarWidget
+    # Top bar which displays current game stats
+
+    level: null
+    group: null
+    scoreLabel: null
+    score: null
+    movesLabel: null
+    moves: null
+
+    constructor: (@level) ->
+        @group = new Kinetic.Group
+
+        @scoreLabel = new Kinetic.Text
+            x: 25
+            y: 5
+            text: 'Score'
+            align: 'center'
+            fontSize: 6
+            fontFamily: 'Inconsolata'
+            fontVariant: '400'
+            fill: '#ecf0f1'
+
+        @score = new Kinetic.Text
+            x: 25
+            y: 15
+            text: @level.score
+            align: 'center'
+            fontSize: 8
+            fontFamily: 'Inconsolata'
+            fontVariant: '400'
+            fill: '#ecf0f1'
+
+        @scoreDiff = new Kinetic.Text
+            x: 25
+            y: 25
+            text: ''
+            align: 'center'
+            fontSize: 6
+            fontFamily: 'Inconsolata'
+            fontVariant: '400'
+            fill: '#ecf0f1'
+
+        @movesLabel = new Kinetic.Text
+            x: 75
+            y: 5
+            text: 'Moves'
+            align: 'center'
+            fontSize: 6
+            fontFamily: 'Inconsolata'
+            fontVariant: '400'
+            fill: '#ecf0f1'
+
+        @moves = new Kinetic.Text
+            x: 75
+            y: 15
+            text: @level.moves
+            align: 'center'
+            fontSize: 8
+            fontFamily: 'Inconsolata'
+            fontVariant: '400'
+            fill: '#ecf0f1'
+
+        @movesDiff = new Kinetic.Text
+            x: 75
+            y: 25
+            text: ''
+            align: 'center'
+            fontSize: 6
+            fontFamily: 'Inconsolata'
+            fontVariant: '400'
+            fill: '#ecf0f1'
+
+        @centerText(@scoreLabel)
+        @centerText(@score)
+        @centerText(@scoreDiff)
+        @centerText(@movesLabel)
+        @centerText(@moves)
+        @centerText(@movesDiff)
+
+        @group.add @scoreLabel
+        @group.add @score
+        @group.add @scoreDiff
+        @group.add @movesLabel
+        @group.add @moves
+        @group.add @movesDiff
+
+    scale: (scale) ->
+        @group.scale {x: scale, y: scale}
+
+    centerText: (text) ->
+        # place label in center of widget
+        text.offsetX(text.width()/2)
+        text.offsetY(text.height()/2)
+
+    update: () ->
+        # update game stats
+        @score.setText(@level.score)
+        if @level.scoreDiff == 0
+            @scoreDiff.setText(' ')
+        else
+            # if new value of scoreDiff than show it and after that fade it out
+            @scoreDiff.setText('+'+@level.scoreDiff)
+            @scoreDiff.opacity(1)
+
+            tween = new Kinetic.Tween
+                node: @scoreDiff
+                opacity: 0
+                duration: TWEEN_DURATION * 5
+
+            tween.play()
+
+        @moves.setText(@level.moves)
+        if @level.movesDiff == 0
+            @movesDiff.setText(' ')
+        else
+            # if new value of movesDiff than show it and after that fade it out
+            @movesDiff.setText('+'+@level.movesDiff)
+            @movesDiff.opacity(1)
+
+            tween = new Kinetic.Tween
+                node: @movesDiff
+                opacity: 0
+                duration: TWEEN_DURATION * 5
+
+            tween.play()
+
+        @centerText(@score)
+        @centerText(@scoreDiff)
+        @centerText(@moves)
+        @centerText(@movesDiff)
+        @group.draw()
+
+
 class Renderer
     # Manage canvas and widgets
 
     board: null
     stage: null
     layer: null
+    level: null
+    topBarWidget: null
 
-    constructor: (@board) ->
-        @cavnasSize = Math.min(window.innerHeight, window.innerWidth) - 20
+    constructor: (@board, @level) ->
+        [width, height] = @getCanvasSize()
+        @cavnasWidth = width
 
         @stage = new Kinetic.Stage
             container: 'wrap'
-            width: @cavnasSize
-            height: @cavnasSize
+            width: width
+            height: height
+
+        @topBarWidget = new TopBarWidget @level
 
         @refreshWidgets()
 
@@ -219,13 +358,29 @@ class Renderer
         for x in [0..@board.size-1]
             for y in [0..@board.size-1]
                 @layer.add @board.fields[x][y].widget.group
+
+        @layer.add @topBarWidget.group
+
         @stage.add @layer
 
+    getCanvasSize: () ->
+        # calculate canvas size
+        if window.innerHeight < window.innerWidth
+            # landscape
+            height = window.innerHeight - 20
+            width = Math.round(height / 1.5)
+        else
+            # portrait
+            width = window.innerWidth - 20
+            height = Math.round(width * 1.5)
+
+        return [width, height]
+
     resizeCanvas: () ->
-        # adjust canvas size to window size
-        @cavnasSize = Math.min(window.innerHeight, window.innerWidth) - 20
-        @stage.setHeight @cavnasSize
-        @stage.setWidth @cavnasSize
+        [width, height] = @getCanvasSize()
+        @cavnasWidth = width
+        @stage.setHeight height
+        @stage.setWidth width
 
     refresh: () ->
         # called after windows resize
@@ -234,14 +389,15 @@ class Renderer
 
     getFieldCenter: (x, y) ->
         # calculate positions of a field widget
-        unit = Math.round(@cavnasSize / (@board.size*2))
+        unit = Math.round(@cavnasWidth / (@board.size*2))
+        topMargin = Math.round(@cavnasWidth * 0.33)
         centerX = 2*unit + x*2*unit
-        centerY = 2*unit + y*2*unit
+        centerY = topMargin + 2*unit + y*2*unit
         return [centerX-unit, centerY-unit]
 
     refreshWidgets: () ->
         # Resize and set positions of widgets
-        unit = Math.round(@cavnasSize / (@board.size*2))
+        unit = Math.round(@cavnasWidth / (@board.size*2))
 
         for x in [0..@board.size-1]
             for y in [0..@board.size-1]
@@ -253,6 +409,8 @@ class Renderer
                     # set 'onClick' callback
                     widget.setupCallback(@startMove)
 
+        @topBarWidget.scale @cavnasWidth / 100
+
     listening: (state) ->
         # toggle listening for event on all field widgets
         for x in [0..@board.size-1]
@@ -263,7 +421,13 @@ class Renderer
     startMove: (field, event) =>
         # deactivate listening until animation is finished
         @listening(false)
+        @level.moves -= 1
+        @level.scoreDiff = 0
+        @level.movesDiff = 0
+        @topBarWidget.update()
+
         @movePoints = 0
+        @moveLength = 0
         # start chain reaction
         @moveToNextField(field)
 
@@ -273,6 +437,7 @@ class Renderer
         [centerX, centerY] = @getFieldCenter nextField.x, nextField.y
         startField.direction = 'none'
         @movePoints += startField.getPoints()
+        @moveLength += 1
 
         tween = new Kinetic.Tween
             node: startField.widget.group
@@ -344,20 +509,37 @@ class Renderer
 
 
     finishMove: () ->
-        # reactivate listening
-        @listening(true)
+        # update level score
+        @level.score += @movePoints
+        @level.scoreDiff = @movePoints
+        if @moveLength > @board.size + 1
+            @level.movesDiff = Math.round((@moveLength - @board.size) / 2)
+            @level.moves += @level.movesDiff
+        @topBarWidget.update()
+
+        if @level.moves > 0
+            # reactivate listening
+            @listening(true)
+        else
+            # game over
+            console.log 'total score: ' + @level.score
 
 
 class Level
     board: null
 
+    score: 0
+    scoreDiff: 0
+    moves: 5
+    movesDiff: 0
+
     constructor: (boardSize=9) ->
         @board = new Board boardSize
-        @renderer = new Renderer @board
+        @renderer = new Renderer @board, @
 
 
 class Game
-    levels_params: [5, 6, 7, 8]
+    levels_params: [6, 7, 8]
     level: null
     level_id: null
 
@@ -367,5 +549,7 @@ class Game
         boardSize = @levels_params[@level_id]
         @level = new Level boardSize
 
-window.game = game = new Game()
-window.onresize = (event) -> game.level.renderer.refresh(event)
+
+window.startGame = () ->
+    window.game = game = new Game()
+    window.onresize = (event) -> game.level.renderer.refresh(event)
