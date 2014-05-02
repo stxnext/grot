@@ -4,9 +4,24 @@ TWEEN_DURATION = 0.5
 
 delay1s = (func) -> setTimeout func, 1000
 
+
 randomChoice = (values) ->
     # http://rosettacode.org/wiki/Pick_random_element#CoffeeScript
     return values[Math.floor(Math.random() * values.length)]
+
+
+class QueryString
+    # Provide easy access to QueryString data
+    # https://gist.github.com/greystate/1274961
+
+    constructor: (@queryString) ->
+        @queryString or= window.document.location.search?.substr 1
+        @variables = @queryString.split '&'
+        @pairs = ([key, value] = pair.split '=' for pair in @variables)
+
+    get: (name) ->
+        for [key, value] in @pairs
+            return value if key is name
 
 
 class FieldWidget
@@ -321,12 +336,15 @@ class TopBarWidget
             @movesDiff.setText('+'+@level.movesDiff)
             @movesDiff.opacity(1)
 
-            tween = new Kinetic.Tween
-                node: @movesDiff
-                opacity: 0
-                duration: TWEEN_DURATION * 5
+            delay1s =>
+                tween = new Kinetic.Tween
+                    node: @movesDiff
+                    opacity: 0
+                    duration: TWEEN_DURATION
+                    onFinish: ->
+                        @destroy()
 
-            tween.play()
+                tween.play()
 
         @centerText(@score)
         @centerText(@scoreDiff)
@@ -561,8 +579,9 @@ class Renderer
         # update level score
         @level.score += @movePoints
         @level.scoreDiff = @movePoints
-        if @moveLength > 2*@board.size
-            @level.movesDiff = Math.round((@moveLength - 2*@board.size) / 2)
+        console.log @moveLength
+        if @moveLength >= Math.round(1.5*@board.size)
+            @level.movesDiff = (@moveLength + 1) - Math.round(1.5*@board.size)
             @level.moves += @level.movesDiff
         @topBarWidget.update()
 
@@ -588,14 +607,14 @@ class Level
 
 
 class Game
-    levels_params: [6, 7, 8]
     level: null
-    level_id: null
 
     constructor: () ->
-        # TODO: get active level id from local storage
-        @level_id = 0
-        boardSize = @levels_params[@level_id]
+        qs = new QueryString
+        boardSize = qs.get('size')
+        if not boardSize?
+            boardSize = 4
+
         @level = new Level boardSize
 
 
