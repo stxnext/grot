@@ -2,6 +2,7 @@
 
 TWEEN_DURATION = 0.5
 
+delay1s = (func) -> setTimeout func, 1000
 
 randomChoice = (values) ->
     # http://rosettacode.org/wiki/Pick_random_element#CoffeeScript
@@ -302,12 +303,15 @@ class TopBarWidget
             @scoreDiff.setText('+'+@level.scoreDiff)
             @scoreDiff.opacity(1)
 
-            tween = new Kinetic.Tween
-                node: @scoreDiff
-                opacity: 0
-                duration: TWEEN_DURATION * 5
+            delay1s =>
+                tween = new Kinetic.Tween
+                    node: @scoreDiff
+                    opacity: 0
+                    duration: TWEEN_DURATION
+                    onFinish: ->
+                        @destroy()
 
-            tween.play()
+                tween.play()
 
         @moves.setText(@level.moves)
         if @level.movesDiff == 0
@@ -328,7 +332,7 @@ class TopBarWidget
         @centerText(@scoreDiff)
         @centerText(@moves)
         @centerText(@movesDiff)
-        @group.draw()
+        @group.getLayer().draw()
 
 
 class Renderer
@@ -336,7 +340,9 @@ class Renderer
 
     board: null
     stage: null
-    layer: null
+    fieldsLayer: null
+    barsLayer: null
+    animLayer: null
     level: null
     topBarWidget: null
 
@@ -354,14 +360,29 @@ class Renderer
         @refreshWidgets()
 
         # add fields widgets to a layer
-        @layer = new Kinetic.Layer
+        @fieldsLayer = new Kinetic.Layer
         for x in [0..@board.size-1]
             for y in [0..@board.size-1]
-                @layer.add @board.fields[x][y].widget.group
+                @fieldsLayer.add @board.fields[x][y].widget.group
 
-        @layer.add @topBarWidget.group
+        # add bars to separated layer
+        @barsLayer = new Kinetic.Layer
+        @barsLayer.add @topBarWidget.group
 
-        @stage.add @layer
+        # create next layers only for animations (better performance)
+        @animLayer = new Kinetic.Layer
+
+        @stage.add @fieldsLayer
+        @stage.add @barsLayer
+        @stage.add @animLayer
+
+    moveFieldToLayer: (field, toLayer) ->
+        # moves field to new layer
+        fromLayer = field.widget.group.getLayer()
+        field.widget.group.moveTo(toLayer)
+        # refresh layers cache
+        fromLayer.draw()
+        toLayer.draw()
 
     getCanvasSize: () ->
         # calculate canvas size
@@ -416,7 +437,7 @@ class Renderer
         for x in [0..@board.size-1]
             for y in [0..@board.size-1]
                 @board.fields[x][y].widget.group.listening(state)
-        @layer.drawHit()
+        @fieldsLayer.drawHit()
 
     startMove: (field, event) =>
         # deactivate listening until animation is finished
@@ -439,6 +460,9 @@ class Renderer
         @movePoints += startField.getPoints()
         @moveLength += 1
 
+        # move field to animLayer until animation is finished
+        @moveFieldToLayer(startField, @animLayer)
+
         tween = new Kinetic.Tween
             node: startField.widget.group
             duration: TWEEN_DURATION
@@ -447,10 +471,15 @@ class Renderer
             opacity: 0
 
             onFinish: =>
+                # move field back to fieldsLayer
+                @moveFieldToLayer(startField, @fieldsLayer)
+
                 if lastMove
                     @lowerFields()
                 else
                     @moveToNextField(nextField)
+
+                `this.destroy()`
 
         tween.play()
 
@@ -466,16 +495,26 @@ class Renderer
                         [newX, newY] = result
                         [centerX, centerY] = @getFieldCenter newX, newY
 
+                        # move field to animLayer until animation is finished
+                        @moveFieldToLayer(field, @animLayer)
+
                         tweens.push new Kinetic.Tween
                             node: field.widget.group
                             easing: Kinetic.Easings.BounceEaseOut,
                             duration: TWEEN_DURATION
                             x: centerX
                             y: centerY
+                            onFinish: =>
+                                # move field back to fieldsLayer
+                                @moveFieldToLayer(field, @fieldsLayer)
+                                `this.destroy()`
 
         if tweens.length > 0
             tweens[0].onFinish = () =>
+                # move field back to fieldsLayer
+                @moveFieldToLayer(field, @fieldsLayer)
                 @fillEmptyFields()
+                `this.destroy()`
 
             for tween in tweens
                 tween.play()
@@ -491,16 +530,26 @@ class Renderer
                 if field.direction == 'none'
                     field.resetRandoms()
 
+                    # move field to animLayer until animation is finished
+                    @moveFieldToLayer(field, @animLayer)
+
                     tweens.push new Kinetic.Tween
                         node: field.widget.group
                         opacity: 1
                         duration: TWEEN_DURATION
+                        onFinish: =>
+                            # move field back to fieldsLayer
+                            @moveFieldToLayer(field, @fieldsLayer)
+                            `this.destroy()`
 
         @refreshWidgets()
 
         if tweens.length > 0
             tweens[0].onFinish = () =>
+                # move field back to fieldsLayer
+                @moveFieldToLayer(field, @fieldsLayer)
                 @finishMove()
+                `this.destroy()`
 
             for tween in tweens
                 tween.play()
@@ -512,8 +561,8 @@ class Renderer
         # update level score
         @level.score += @movePoints
         @level.scoreDiff = @movePoints
-        if @moveLength > @board.size + 1
-            @level.movesDiff = Math.round((@moveLength - @board.size) / 2)
+        if @moveLength > 2*@board.size
+            @level.movesDiff = Math.round((@moveLength - 2*@board.size) / 2)
             @level.moves += @level.movesDiff
         @topBarWidget.update()
 
