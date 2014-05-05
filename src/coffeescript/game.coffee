@@ -42,11 +42,11 @@ class FieldWidget
         red: '#e74c3c'
 
     arrows:
-        left: String.fromCharCode(8592)
-        right: String.fromCharCode(8594)
-        up: String.fromCharCode(8593)
-        down: String.fromCharCode(8595)
-        none: ' '
+        left: 270
+        right: 90
+        up: 0
+        down: 180
+        none: 0
 
     constructor: (@field) ->
         # create elements of widget
@@ -57,26 +57,13 @@ class FieldWidget
             y: 0
             radius: 45
             fill: @colors[@field.value]
+            transformsEnabled: 'position'
 
-        @label = new Kinetic.Text
-            x: 0
-            y: 0
-            text: @arrows[@field.direction]
-            align: 'center'
-            fontSize: 55
-            fontFamily: 'Calibri'
-            fontStyle: 'bold'
-            fill: '#333333'
-
-        @centerLabel()
+        @arrow = arrow.clone()
+        @arrow.rotate(@arrows[@field.direction])
 
         @group.add @circle
-        @group.add @label
-
-    centerLabel: () ->
-        # place label in center of widget
-        @label.offsetX(@label.width()/2)
-        @label.offsetY(@label.height()/2)
+        @group.add @arrow
 
     move: (x, y) ->
         # to move widget to absolute position we have to calculate relative position
@@ -92,8 +79,8 @@ class FieldWidget
     reset: () ->
         # update color and arrow after field reset
         @circle.fill(@colors[@field.value])
-        @label.setText(@arrows[@field.direction])
-        @centerLabel()
+        angle = @arrows[@field.direction] - @arrow.rotation()
+        @arrow.rotate(angle)
 
     setupCallback: (@callback) ->
         # setup 'onClick'
@@ -232,8 +219,7 @@ class TopBarWidget
             text: 'Score'
             align: 'center'
             fontSize: 6
-            fontFamily: 'Inconsolata'
-            fontVariant: '400'
+            fontFamily: 'Courier New'
             fill: '#ecf0f1'
 
         @score = new Kinetic.Text
@@ -242,8 +228,7 @@ class TopBarWidget
             text: @level.score
             align: 'center'
             fontSize: 8
-            fontFamily: 'Inconsolata'
-            fontVariant: '400'
+            fontFamily: 'Courier New'
             fill: '#ecf0f1'
 
         @scoreDiff = new Kinetic.Text
@@ -252,8 +237,7 @@ class TopBarWidget
             text: ''
             align: 'center'
             fontSize: 6
-            fontFamily: 'Inconsolata'
-            fontVariant: '400'
+            fontFamily: 'Courier New'
             fill: '#ecf0f1'
 
         @movesLabel = new Kinetic.Text
@@ -262,8 +246,7 @@ class TopBarWidget
             text: 'Moves'
             align: 'center'
             fontSize: 6
-            fontFamily: 'Inconsolata'
-            fontVariant: '400'
+            fontFamily: 'Courier New'
             fill: '#ecf0f1'
 
         @moves = new Kinetic.Text
@@ -272,8 +255,7 @@ class TopBarWidget
             text: @level.moves
             align: 'center'
             fontSize: 8
-            fontFamily: 'Inconsolata'
-            fontVariant: '400'
+            fontFamily: 'Courier New'
             fill: '#ecf0f1'
 
         @movesDiff = new Kinetic.Text
@@ -282,8 +264,7 @@ class TopBarWidget
             text: ''
             align: 'center'
             fontSize: 6
-            fontFamily: 'Inconsolata'
-            fontVariant: '400'
+            fontFamily: 'Courier New'
             fill: '#ecf0f1'
 
         @centerText(@scoreLabel)
@@ -385,6 +366,7 @@ class Renderer
 
         # add bars to separated layer
         @barsLayer = new Kinetic.Layer
+            hitGraphEnabled: false
         @barsLayer.add @topBarWidget.group
 
         # create next layers only for animations (better performance)
@@ -580,8 +562,9 @@ class Renderer
         @level.score += @movePoints
         @level.scoreDiff = @movePoints
         console.log @moveLength
-        if @moveLength >= Math.round(1.5*@board.size)
-            @level.movesDiff = (@moveLength + 1) - Math.round(1.5*@board.size)
+        boardQuarter = Math.round((@board.size*@board.size)/4)
+        if @moveLength >= boardQuarter
+            @level.movesDiff = Math.round((@moveLength - boardQuarter)/2) + 1
             @level.moves += @level.movesDiff
         @topBarWidget.update()
 
@@ -618,6 +601,5 @@ class Game
         @level = new Level boardSize
 
 
-window.startGame = () ->
-    window.game = game = new Game()
-    window.onresize = (event) -> game.level.renderer.refresh(event)
+window.game = game = new Game()
+# window.onresize = (event) -> game.level.renderer.refresh(event)
