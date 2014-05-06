@@ -538,6 +538,24 @@ class Renderer
         tween.play()
 
     lowerFields: () ->
+        for x in [0..@board.size-1]
+            isEmptyColumn = true
+            for y in [0..@board.size-1]
+                if @board.fields[x][y].direction != 'none'
+                    isEmptyColumn = false
+
+            if isEmptyColumn
+                @movePoints += 10
+
+        for y in [0..@board.size-1]
+            isEmptyRow = true
+            for x in [0..@board.size-1]
+                if @board.fields[x][y].direction != 'none'
+                    isEmptyRow = false
+
+            if isEmptyRow
+                @movePoints += 10
+
         # lower fields (gravity)
         tweens = []
         for y in [@board.size-2..0]
@@ -605,9 +623,10 @@ class Renderer
 
     finishMove: () ->
         # update level score
+
         @level.score += @movePoints
         @level.scoreDiff = @movePoints
-        console.log @moveLength
+        # console.log @moveLength
         boardQuarter = Math.round((@board.size*@board.size)/4)
         if @moveLength >= boardQuarter
             @level.movesDiff = Math.round((@moveLength - boardQuarter)/2) + 1
