@@ -18,6 +18,8 @@ html:
 	cp $(INPUTDIR)/html/*.html $(OUTPUTDIR)
 	mkdir -p $(OUTPUTDIR)/js
 	cp $(INPUTDIR)/javascript/*.js $(OUTPUTDIR)/js
+	mkdir -p $(OUTPUTDIR)/img
+	cp $(INPUTDIR)/images/* $(OUTPUTDIR)/img
 	/opt/nodejs/bin/coffee --compile --output $(OUTPUTDIR)/js $(INPUTDIR)/coffeescript
 
 clean:

@@ -51,6 +51,7 @@ class FieldWidget
     constructor: (@field) ->
         # create elements of widget
         @group = new Kinetic.Group
+            field: @field
 
         @circle = new Kinetic.Circle
             x: 0
@@ -101,10 +102,10 @@ class Field
     board: null
 
     points:
-        gray: 0
-        blue: 1
-        green: 2
-        red: 3
+        gray: 1
+        blue: 2
+        green: 3
+        red: 4
 
     constructor: (@board, @x, @y) ->
         @id = "#{@x}-#{@y}"
@@ -334,6 +335,59 @@ class TopBarWidget
         @group.getLayer().draw()
 
 
+class BottomBarWidget
+    # Bottom bar which displays help button
+
+    group: null
+    label: null
+    help: null
+
+    constructor: (@level) ->
+        @group = new Kinetic.Group
+
+        @label = new Kinetic.Text
+            x: 50
+            y: 145
+            text: 'Help'
+            align: 'center'
+            fontSize: 6
+            fontFamily: 'Courier New'
+            fill: '#ecf0f1'
+
+        @centerText(@label)
+        @group.add @label
+
+        imageObj = new Image()
+        imageObj.onload = () =>
+            @help = new Kinetic.Image
+                x: 10
+                y: 2
+                image: imageObj
+                width: 82
+                height: 146
+
+            @help.hide()
+            @help.on 'mousedown touchstart', (event) =>
+                @help.hide()
+                @group.getLayer().draw()
+
+            @group.add(@help)
+
+        imageObj.src = 'img/help.png'
+
+        @label.on 'mousedown touchstart', (event) =>
+            @help.moveToTop()
+            @help.show()
+            @group.getLayer().draw()
+
+    centerText: (text) ->
+        # place label in center of widget
+        text.offsetX(text.width()/2)
+        text.offsetY(text.height()/2)
+
+    scale: (scale) ->
+        @group.scale {x: scale, y: scale}
+
 class Renderer
     # Manage canvas and widgets
 
@@ -355,6 +409,7 @@ class Renderer
             height: height
 
         @topBarWidget = new TopBarWidget @level
+        @bottomBarWidget = new BottomBarWidget @level
 
         @refreshWidgets()
 
@@ -366,15 +421,16 @@ class Renderer
 
         # add bars to separated layer
         @barsLayer = new Kinetic.Layer
-            hitGraphEnabled: false
         @barsLayer.add @topBarWidget.group
+        @barsLayer.add @bottomBarWidget.group
 
         # create next layers only for animations (better performance)
         @animLayer = new Kinetic.Layer
+            hitGraphEnabled: false
 
         @stage.add @fieldsLayer
-        @stage.add @barsLayer
         @stage.add @animLayer
+        @stage.add @barsLayer
 
     moveFieldToLayer: (field, toLayer) ->
         # moves field to new layer
@@ -431,6 +487,7 @@ class Renderer
                     widget.setupCallback(@startMove)
 
         @topBarWidget.scale @cavnasWidth / 100
+        @bottomBarWidget.scale @cavnasWidth / 100
 
     listening: (state) ->
         # toggle listening for event on all field widgets
@@ -471,9 +528,6 @@ class Renderer
             opacity: 0
 
             onFinish: =>
-                # move field back to fieldsLayer
-                @moveFieldToLayer(startField, @fieldsLayer)
-
                 if lastMove
                     @lowerFields()
                 else
@@ -505,14 +559,10 @@ class Renderer
                             x: centerX
                             y: centerY
                             onFinish: =>
-                                # move field back to fieldsLayer
-                                @moveFieldToLayer(field, @fieldsLayer)
                                 `this.destroy()`
 
         if tweens.length > 0
             tweens[0].onFinish = () =>
-                # move field back to fieldsLayer
-                @moveFieldToLayer(field, @fieldsLayer)
                 @fillEmptyFields()
                 `this.destroy()`
 
@@ -538,16 +588,12 @@ class Renderer
                         opacity: 1
                         duration: TWEEN_DURATION
                         onFinish: =>
-                            # move field back to fieldsLayer
-                            @moveFieldToLayer(field, @fieldsLayer)
                             `this.destroy()`
 
         @refreshWidgets()
 
         if tweens.length > 0
             tweens[0].onFinish = () =>
-                # move field back to fieldsLayer
-                @moveFieldToLayer(field, @fieldsLayer)
                 @finishMove()
                 `this.destroy()`
 
@@ -567,6 +613,10 @@ class Renderer
             @level.movesDiff = Math.round((@moveLength - boardQuarter)/2) + 1
             @level.moves += @level.movesDiff
         @topBarWidget.update()
+
+        fields = (group.attrs.field for group in @animLayer.children)
+        for field in fields
+            @moveFieldToLayer(field, @fieldsLayer)
 
         if @level.moves > 0
             # reactivate listening
