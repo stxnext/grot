@@ -644,16 +644,38 @@
     };
 
     Renderer.prototype.lowerFields = function() {
-      var centerX, centerY, field, newX, newY, result, tween, tweens, x, y, _i, _j, _k, _len, _ref, _ref1, _ref2, _results;
+      var centerX, centerY, field, isEmptyColumn, isEmptyRow, newX, newY, result, tween, tweens, x, y, _i, _j, _k, _l, _len, _m, _n, _o, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _results;
+      for (x = _i = 0, _ref = this.board.size - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; x = 0 <= _ref ? ++_i : --_i) {
+        isEmptyColumn = true;
+        for (y = _j = 0, _ref1 = this.board.size - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; y = 0 <= _ref1 ? ++_j : --_j) {
+          if (this.board.fields[x][y].direction !== 'none') {
+            isEmptyColumn = false;
+          }
+        }
+        if (isEmptyColumn) {
+          this.movePoints += 10;
+        }
+      }
+      for (y = _k = 0, _ref2 = this.board.size - 1; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; y = 0 <= _ref2 ? ++_k : --_k) {
+        isEmptyRow = true;
+        for (x = _l = 0, _ref3 = this.board.size - 1; 0 <= _ref3 ? _l <= _ref3 : _l >= _ref3; x = 0 <= _ref3 ? ++_l : --_l) {
+          if (this.board.fields[x][y].direction !== 'none') {
+            isEmptyRow = false;
+          }
+        }
+        if (isEmptyRow) {
+          this.movePoints += 10;
+        }
+      }
       tweens = [];
-      for (y = _i = _ref = this.board.size - 2; _ref <= 0 ? _i <= 0 : _i >= 0; y = _ref <= 0 ? ++_i : --_i) {
-        for (x = _j = 0, _ref1 = this.board.size - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; x = 0 <= _ref1 ? ++_j : --_j) {
+      for (y = _m = _ref4 = this.board.size - 2; _ref4 <= 0 ? _m <= 0 : _m >= 0; y = _ref4 <= 0 ? ++_m : --_m) {
+        for (x = _n = 0, _ref5 = this.board.size - 1; 0 <= _ref5 ? _n <= _ref5 : _n >= _ref5; x = 0 <= _ref5 ? ++_n : --_n) {
           field = this.board.fields[x][y];
           if (field.direction !== 'none') {
             result = this.board.lowerField(field);
             if (result.length === 2) {
               newX = result[0], newY = result[1];
-              _ref2 = this.getFieldCenter(newX, newY), centerX = _ref2[0], centerY = _ref2[1];
+              _ref6 = this.getFieldCenter(newX, newY), centerX = _ref6[0], centerY = _ref6[1];
               this.moveFieldToLayer(field, this.animLayer);
               tweens.push(new Kinetic.Tween({
                 node: field.widget.group,
@@ -679,8 +701,8 @@
           };
         })(this);
         _results = [];
-        for (_k = 0, _len = tweens.length; _k < _len; _k++) {
-          tween = tweens[_k];
+        for (_o = 0, _len = tweens.length; _o < _len; _o++) {
+          tween = tweens[_o];
           _results.push(tween.play());
         }
         return _results;
@@ -734,7 +756,6 @@
       var boardQuarter, field, fields, group, _i, _len;
       this.level.score += this.movePoints;
       this.level.scoreDiff = this.movePoints;
-      console.log(this.moveLength);
       boardQuarter = Math.round((this.board.size * this.board.size) / 4);
       if (this.moveLength >= boardQuarter) {
         this.level.movesDiff = Math.round((this.moveLength - boardQuarter) / 2) + 1;
