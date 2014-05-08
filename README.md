@@ -7,7 +7,7 @@ Simple HTML5 canvas logic game.
 Demo
 ----
 
-http://sargo.github.io/grot/
+http://grot.hackathons.stxnext.pl/
 
 
 Author
