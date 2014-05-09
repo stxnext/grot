@@ -114,7 +114,14 @@ class Field
 
     resetRandoms: () ->
         # choose random value and random direction
-        @value = randomChoice((k for k of @points))
+        # most common is gray field, most rare is red one.
+        points = [
+            'gray', 'gray', 'gray', 'gray',
+            'blue', 'blue', 'blue',
+            'green', 'green',
+            'red'
+        ]
+        @value = randomChoice(points)
         @direction = randomChoice(['left', 'right', 'up', 'down'])
         if @widget?
             @widget.reset()
@@ -626,10 +633,12 @@ class Renderer
 
         @level.score += @movePoints
         @level.scoreDiff = @movePoints
-        # console.log @moveLength
-        boardQuarter = Math.round((@board.size*@board.size)/4)
-        if @moveLength >= boardQuarter
-            @level.movesDiff = Math.round((@moveLength - boardQuarter)/2) + 1
+
+        # threshold depends on current score, so more points you have -> longer path
+        # you have to create to get moves bonus
+        threshold = Math.floor(@level.score / (@board.size*20)) + @board.size - 1
+        if @moveLength >= threshold
+            @level.movesDiff = @moveLength - threshold
             @level.moves += @level.movesDiff
         @topBarWidget.update()
 
