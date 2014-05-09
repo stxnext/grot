@@ -159,15 +159,9 @@
     }
 
     Field.prototype.resetRandoms = function() {
-      var k;
-      this.value = randomChoice((function() {
-        var _results;
-        _results = [];
-        for (k in this.points) {
-          _results.push(k);
-        }
-        return _results;
-      }).call(this));
+      var points;
+      points = ['gray', 'gray', 'gray', 'gray', 'blue', 'blue', 'blue', 'green', 'green', 'red'];
+      this.value = randomChoice(points);
       this.direction = randomChoice(['left', 'right', 'up', 'down']);
       if (this.widget != null) {
         return this.widget.reset();
@@ -753,12 +747,14 @@
     };
 
     Renderer.prototype.finishMove = function() {
-      var boardQuarter, field, fields, group, _i, _len;
+      var field, fields, group, threshold, _i, _len;
       this.level.score += this.movePoints;
       this.level.scoreDiff = this.movePoints;
-      boardQuarter = Math.round((this.board.size * this.board.size) / 4);
-      if (this.moveLength >= boardQuarter) {
-        this.level.movesDiff = Math.round((this.moveLength - boardQuarter) / 2) + 1;
+      threshold = Math.floor(this.level.score / (this.board.size * 20)) + this.board.size - 1;
+      console.log(this.moveLength);
+      console.log(threshold);
+      if (this.moveLength >= threshold) {
+        this.level.movesDiff = this.moveLength - threshold;
         this.level.moves += this.level.movesDiff;
       }
       this.topBarWidget.update();
