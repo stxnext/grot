@@ -626,7 +626,7 @@
         onFinish: (function(_this) {
           return function() {
             if (lastMove) {
-              _this.lowerFields();
+              _this.checkEmptyLines();
             } else {
               _this.moveToNextField(nextField);
             }
@@ -637,8 +637,8 @@
       return tween.play();
     };
 
-    Renderer.prototype.lowerFields = function() {
-      var centerX, centerY, field, isEmptyColumn, isEmptyRow, newX, newY, result, tween, tweens, x, y, _i, _j, _k, _l, _len, _m, _n, _o, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _results;
+    Renderer.prototype.checkEmptyLines = function() {
+      var isEmptyColumn, isEmptyRow, x, y, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
       for (x = _i = 0, _ref = this.board.size - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; x = 0 <= _ref ? ++_i : --_i) {
         isEmptyColumn = true;
         for (y = _j = 0, _ref1 = this.board.size - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; y = 0 <= _ref1 ? ++_j : --_j) {
@@ -647,7 +647,7 @@
           }
         }
         if (isEmptyColumn) {
-          this.movePoints += 10;
+          this.movePoints += this.board.size * 10;
         }
       }
       for (y = _k = 0, _ref2 = this.board.size - 1; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; y = 0 <= _ref2 ? ++_k : --_k) {
@@ -658,18 +658,23 @@
           }
         }
         if (isEmptyRow) {
-          this.movePoints += 10;
+          this.movePoints += this.board.size * 10;
         }
       }
+      return this.lowerFields();
+    };
+
+    Renderer.prototype.lowerFields = function() {
+      var centerX, centerY, field, newX, newY, result, tween, tweens, x, y, _i, _j, _k, _len, _ref, _ref1, _ref2, _results;
       tweens = [];
-      for (y = _m = _ref4 = this.board.size - 2; _ref4 <= 0 ? _m <= 0 : _m >= 0; y = _ref4 <= 0 ? ++_m : --_m) {
-        for (x = _n = 0, _ref5 = this.board.size - 1; 0 <= _ref5 ? _n <= _ref5 : _n >= _ref5; x = 0 <= _ref5 ? ++_n : --_n) {
+      for (y = _i = _ref = this.board.size - 2; _ref <= 0 ? _i <= 0 : _i >= 0; y = _ref <= 0 ? ++_i : --_i) {
+        for (x = _j = 0, _ref1 = this.board.size - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; x = 0 <= _ref1 ? ++_j : --_j) {
           field = this.board.fields[x][y];
           if (field.direction !== 'none') {
             result = this.board.lowerField(field);
             if (result.length === 2) {
               newX = result[0], newY = result[1];
-              _ref6 = this.getFieldCenter(newX, newY), centerX = _ref6[0], centerY = _ref6[1];
+              _ref2 = this.getFieldCenter(newX, newY), centerX = _ref2[0], centerY = _ref2[1];
               this.moveFieldToLayer(field, this.animLayer);
               tweens.push(new Kinetic.Tween({
                 node: field.widget.group,
@@ -695,8 +700,8 @@
           };
         })(this);
         _results = [];
-        for (_o = 0, _len = tweens.length; _o < _len; _o++) {
-          tween = tweens[_o];
+        for (_k = 0, _len = tweens.length; _k < _len; _k++) {
+          tween = tweens[_k];
           _results.push(tween.play());
         }
         return _results;
@@ -750,9 +755,7 @@
       var field, fields, group, threshold, _i, _len;
       this.level.score += this.movePoints;
       this.level.scoreDiff = this.movePoints;
-      threshold = Math.floor(this.level.score / (this.board.size * 20)) + this.board.size - 1;
-      console.log(this.moveLength);
-      console.log(threshold);
+      threshold = Math.floor(this.level.score / (5 * this.board.size * this.board.size)) + this.board.size - 1;
       if (this.moveLength >= threshold) {
         this.level.movesDiff = this.moveLength - threshold;
         this.level.moves += this.level.movesDiff;
