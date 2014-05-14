@@ -536,7 +536,7 @@ class Renderer
 
             onFinish: =>
                 if lastMove
-                    @lowerFields()
+                    @checkEmptyLines()
                 else
                     @moveToNextField(nextField)
 
@@ -544,7 +544,8 @@ class Renderer
 
         tween.play()
 
-    lowerFields: () ->
+    checkEmptyLines: () ->
+        # count empty rows and columns and give extra points
         for x in [0..@board.size-1]
             isEmptyColumn = true
             for y in [0..@board.size-1]
@@ -552,7 +553,7 @@ class Renderer
                     isEmptyColumn = false
 
             if isEmptyColumn
-                @movePoints += 10
+                @movePoints += @board.size * 10
 
         for y in [0..@board.size-1]
             isEmptyRow = true
@@ -561,8 +562,11 @@ class Renderer
                     isEmptyRow = false
 
             if isEmptyRow
-                @movePoints += 10
+                @movePoints += @board.size * 10
 
+        @lowerFields()
+
+    lowerFields: () ->
         # lower fields (gravity)
         tweens = []
         for y in [@board.size-2..0]
@@ -636,7 +640,7 @@ class Renderer
 
         # threshold depends on current score, so more points you have -> longer path
         # you have to create to get moves bonus
-        threshold = Math.floor(@level.score / (@board.size*20)) + @board.size - 1
+        threshold = Math.floor(@level.score / (5*@board.size*@board.size)) + @board.size - 1
         if @moveLength >= threshold
             @level.movesDiff = @moveLength - threshold
             @level.moves += @level.movesDiff
