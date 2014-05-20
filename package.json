@@ -1,0 +1,25 @@
+{
+  "name": "grot",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-coffee": "^0.10.1",
+    "grunt-contrib-concat": "^0.4.0",
+    "grunt-contrib-connect": "^0.7.1",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-uglify": "^0.4.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-open": "^0.2.3",
+    "grunt-usemin": "^2.1.1"
+  },
+  "scripts": {
+    "build": "./node_modules/.bin/grunt build",
+    "dev": "./node_modules/.bin/grunt dev"
+  },
+  "engines": {
+    "node": ">=0.9.0"
+  }
+}
