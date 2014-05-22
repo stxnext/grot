@@ -675,13 +675,15 @@ class Game
     level: null
 
     constructor: () ->
-        qs = new QueryString
-        boardSize = qs.get('size')
-        if not boardSize?
-            boardSize = 4
+        qs = (new QueryString).get('size')
+
+        boardSize = if cfg.customBoardSize and qs
+        then qs else cfg.defaultBoardSize
 
         @level = new Level boardSize
 
+        window.onresize = (event) -> @level.renderer.refresh(event)
+        if !!window.ondeviceorientation
+          window.ondeviceorientation (event) -> @level.renderer.refresh(event)
 
 window.game = game = new Game()
-# window.onresize = (event) -> game.level.renderer.refresh(event)
