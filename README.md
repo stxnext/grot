@@ -40,5 +40,5 @@ http://grot.hackathons.stxnext.pl/
 Authors
 -------
 
-Wojciech Lichota <wojciech@lichota.pl>
-Michal Janiszewski
+ * [Wojciech Lichota](http://lichota.pl)
+ * [Michal Janiszewski](http://mjaniszew.pl)
