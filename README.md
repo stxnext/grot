@@ -37,7 +37,8 @@ Demo
 http://grot.hackathons.stxnext.pl/
 
 
-Author
-------
+Authors
+-------
 
 Wojciech Lichota <wojciech@lichota.pl>
+Michal Janiszewski
