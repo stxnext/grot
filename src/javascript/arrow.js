@@ -218,7 +218,7 @@ var arrowCommands = [
 
 
 var arrow = new Kinetic.Shape({
-    sceneFunc: function(ctx) { 
+    sceneFunc: function(ctx) {
         var i, cmd;
         ctx.beginPath();
         for (i = 0; i < arrowCommands.length; i += 1) {
@@ -237,6 +237,5 @@ var arrow = new Kinetic.Shape({
         }
         ctx.fillStrokeShape(this);
     },
-    fill: '#333333'
+    fill: cfg.arrowColor
 });
-    

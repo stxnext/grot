@@ -18,3 +18,9 @@ coverage
 
 # Compiled binary
 build
+
+# Node local modules directory
+node_modules
+
+# Ignore hidden files as they're usually working folders and we don't want them in repo
+.*
