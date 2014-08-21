@@ -1,9 +1,8 @@
 # GROT - html5 canvas game
 
-TWEEN_DURATION = 0.5
+TWEEN_DURATION = cfg.tweenDuration
 
 delay1s = (func) -> setTimeout func, 1000
-
 
 randomChoice = (values) ->
     # http://rosettacode.org/wiki/Pick_random_element#CoffeeScript
@@ -35,11 +34,12 @@ class FieldWidget
     callback: null
 
     # based on: http://flatuicolors.com/
+
     colors:
-        gray: '#95a5a6'
-        blue: '#2980b9'
-        green: '#27ae60'
-        red: '#e74c3c'
+        gray: cfg.circleColor1
+        blue: cfg.circleColor2
+        green: cfg.circleColor3
+        red: cfg.circleColor4
 
     arrows:
         left: 270
@@ -56,7 +56,7 @@ class FieldWidget
         @circle = new Kinetic.Circle
             x: 0
             y: 0
-            radius: 45
+            radius: cfg.circleRadius
             fill: @colors[@field.value]
             transformsEnabled: 'position'
 
@@ -75,7 +75,7 @@ class FieldWidget
 
     scale: (scale) ->
         # always scale with ration=1 (the same in both dimensions)
-        @group.scale {x: scale, y: scale}
+        @group.scale {x: scale/cfg.spaceBetweenFields, y: scale/cfg.spaceBetweenFields}
 
     reset: () ->
         # update color and arrow after field reset
@@ -226,54 +226,54 @@ class TopBarWidget
             y: 5
             text: 'Score'
             align: 'center'
-            fontSize: 6
-            fontFamily: 'Courier New'
-            fill: '#ecf0f1'
+            fontSize: cfg.fontRestSize
+            fontFamily: cfg.fontFamily
+            fill: cfg.fontColor
 
         @score = new Kinetic.Text
             x: 25
             y: 15
             text: @level.score
             align: 'center'
-            fontSize: 8
-            fontFamily: 'Courier New'
-            fill: '#ecf0f1'
+            fontSize: cfg.fontScoMovSize
+            fontFamily: cfg.fontFamily
+            fill: cfg.fontColor
 
         @scoreDiff = new Kinetic.Text
             x: 25
             y: 25
             text: ''
             align: 'center'
-            fontSize: 6
-            fontFamily: 'Courier New'
-            fill: '#ecf0f1'
+            fontSize: cfg.fontRestSize
+            fontFamily: cfg.fontFamily
+            fill: cfg.fontColor
 
         @movesLabel = new Kinetic.Text
             x: 75
             y: 5
             text: 'Moves'
             align: 'center'
-            fontSize: 6
-            fontFamily: 'Courier New'
-            fill: '#ecf0f1'
+            fontSize: cfg.fontRestSize
+            fontFamily: cfg.fontFamily
+            fill: cfg.fontColor
 
         @moves = new Kinetic.Text
             x: 75
             y: 15
             text: @level.moves
             align: 'center'
-            fontSize: 8
-            fontFamily: 'Courier New'
-            fill: '#ecf0f1'
+            fontSize: cfg.fontScoMovSize
+            fontFamily: cfg.fontFamily
+            fill: cfg.fontColor
 
         @movesDiff = new Kinetic.Text
             x: 75
             y: 25
             text: ''
             align: 'center'
-            fontSize: 6
-            fontFamily: 'Courier New'
-            fill: '#ecf0f1'
+            fontSize: cfg.fontRestSize
+            fontFamily: cfg.fontFamily
+            fill: cfg.fontColor
 
         @centerText(@scoreLabel)
         @centerText(@score)
@@ -357,9 +357,9 @@ class BottomBarWidget
             y: 145
             text: 'Help'
             align: 'center'
-            fontSize: 6
-            fontFamily: 'Courier New'
-            fill: '#ecf0f1'
+            fontSize: cfg.fontRestSize
+            fontFamily: cfg.fontFamily
+            fill: cfg.fontColor
 
         @centerText(@label)
         @group.add @label
@@ -685,5 +685,7 @@ class Game
         window.onresize = (event) -> @level.renderer.refresh(event)
         if !!window.ondeviceorientation
           window.ondeviceorientation (event) -> @level.renderer.refresh(event)
+
+        document.body.style.cssText = 'background-color: ' + cfg.bodyColor + ';'
 
 window.game = game = new Game()
