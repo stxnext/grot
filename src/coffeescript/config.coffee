@@ -43,3 +43,9 @@ window.cfg =
   Background color settings
   ###
   bodyColor: '#333333'
+  gameOverMessageColor: 'green'
+
+  ###
+  Urls settings
+  ###
+  scoreBoardLink: 'http://stxnext.pl/'

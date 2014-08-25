@@ -395,6 +395,87 @@ class BottomBarWidget
     scale: (scale) ->
         @group.scale {x: scale, y: scale}
 
+
+class GameOverWidget
+    # Bottom bar which displays help button
+
+    group: null
+    gameOverLayer: null
+
+    constructor: (@level) ->
+        @group = new Kinetic.Group
+
+        @gameOverLayer = new Kinetic.Group
+
+        background = new Kinetic.Rect
+            width: 82
+            height: 146
+            x: 10
+            y: 2
+            fill: cfg.gameOverMessageColor
+            opacity: 0.75
+
+        @gameOverMsg = new Kinetic.Text
+            x: 50
+            y: 50
+            text: ''
+            align: 'center'
+            fontSize: 8
+            fontFamily: cfg.fontFamily
+            fill: cfg.fontColor
+
+        @scoreBoardLink = new Kinetic.Text
+            x: 50
+            y: 100
+            text: 'GO TO\nSCORE BOARD'
+            align: 'center'
+            fontSize: 8
+            fontFamily: cfg.fontFamily
+            fill: 'red'
+
+        @resetGame = new Kinetic.Text
+            x: 24
+            y: 6
+            text: 'NEW GAME'
+            align: 'center'
+            fontSize: 5
+            fontStyle: 'Bold'
+            fontFamily: cfg.fontFamily
+            fill: 'blue'
+
+        @scoreBoardLink.on 'mousedown touchstart', (event) =>
+            window.location.replace(cfg.scoreBoardLink)
+
+        @resetGame.on 'mousedown touchstart', (event) =>
+            window.location.replace(window.location.href)
+
+        @centerText(@scoreBoardLink)
+        @centerText(@gameOverMsg)
+        @centerText(@resetGame)
+
+        @gameOverLayer.add(background)
+        @gameOverLayer.add(@gameOverMsg)
+        @gameOverLayer.add(@scoreBoardLink)
+        @gameOverLayer.add(@resetGame)
+
+    centerText: (text) ->
+        # place label in center of widget
+        text.offsetX(text.width()/2)
+        text.offsetY(text.height()/2)
+
+    scale: (scale) ->
+        @group.scale {x: scale, y: scale}
+
+    draw: () =>
+        @group.add(@gameOverLayer)
+        @group.getLayer().draw()
+
+    update: () ->
+        # update result for game over message
+        @gameOverMsg.setText('GAME OVER\nResult:\n' + @level.score)
+        @centerText(@gameOverMsg)
+
+
 class Renderer
     # Manage canvas and widgets
 
@@ -405,6 +486,7 @@ class Renderer
     animLayer: null
     level: null
     topBarWidget: null
+    gameOverWidget: null
 
     constructor: (@board, @level) ->
         [width, height] = @getCanvasSize()
@@ -417,6 +499,7 @@ class Renderer
 
         @topBarWidget = new TopBarWidget @level
         @bottomBarWidget = new BottomBarWidget @level
+        @gameOverWidget = new GameOverWidget @level
 
         @refreshWidgets()
 
@@ -430,6 +513,7 @@ class Renderer
         @barsLayer = new Kinetic.Layer
         @barsLayer.add @topBarWidget.group
         @barsLayer.add @bottomBarWidget.group
+        @barsLayer.add @gameOverWidget.group
 
         # create next layers only for animations (better performance)
         @animLayer = new Kinetic.Layer
@@ -495,6 +579,7 @@ class Renderer
 
         @topBarWidget.scale @cavnasWidth / 100
         @bottomBarWidget.scale @cavnasWidth / 100
+        @gameOverWidget.scale @cavnasWidth / 100
 
     listening: (state) ->
         # toggle listening for event on all field widgets
@@ -631,6 +716,9 @@ class Renderer
         else
             @finishMove()
 
+    gameOver: () ->
+        # return message with scored result
+        @gameOverWidget.draw()
 
     finishMove: () ->
         # update level score
@@ -656,6 +744,8 @@ class Renderer
         else
             # game over
             console.log 'total score: ' + @level.score
+            @gameOverWidget.update()
+            @gameOver(@level)
 
 
 class Level
