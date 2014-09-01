@@ -4,6 +4,11 @@ window.cfg =
   ###
   defaultBoardSize: 4
 
+  baseScale: 1
+  baseWindowSize:
+    width: 1600
+    height: 900
+
   ###
   Enables or disables possibility to pass
   initial board size as ?size=x param
@@ -19,8 +24,8 @@ window.cfg =
   circleColor4: '#e74c3c'
 
   circleRadius: 45
+  spaceBetweenFields: 12
 
-  spaceBetweenFields: 1
   ###
   Arrow settings
   ###
@@ -36,8 +41,8 @@ window.cfg =
   ###
   fontColor: '#ecf0f1'
   fontFamily: 'Courier New'
-  fontScoMovSize: 8
-  fontRestSize: 6
+  fontScoMovSize: 46
+  fontRestSize: 38
 
   ###
   Background color settings
