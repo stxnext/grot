@@ -239,7 +239,8 @@ class TopBarWidget extends GrotEngine.Widget
             align: 'center'
             fontSize: cfg.fontRestSize
             fontFamily: cfg.fontFamily
-            fill: cfg.fontColor
+            fontStyle: cfg.fontStyle
+            fill: cfg.fontScoMovColor
 
         @score = new Kinetic.Text
             x: 150
@@ -248,7 +249,8 @@ class TopBarWidget extends GrotEngine.Widget
             align: 'center'
             fontSize: cfg.fontScoMovSize
             fontFamily: cfg.fontFamily
-            fill: cfg.fontColor
+            fontStyle: cfg.fontStyle
+            fill: cfg.fontScoMovNumColor
 
         @scoreDiff = new Kinetic.Text
             x: 150
@@ -257,7 +259,7 @@ class TopBarWidget extends GrotEngine.Widget
             align: 'center'
             fontSize: cfg.fontRestSize
             fontFamily: cfg.fontFamily
-            fill: cfg.fontColor
+            fill: cfg.fontScoMovNumColor
 
         @movesLabel = new Kinetic.Text
             x: 450
@@ -266,7 +268,8 @@ class TopBarWidget extends GrotEngine.Widget
             align: 'center'
             fontSize: cfg.fontRestSize
             fontFamily: cfg.fontFamily
-            fill: cfg.fontColor
+            fontStyle: cfg.fontStyle
+            fill: cfg.fontScoMovColor
 
         @moves = new Kinetic.Text
             x: 450
@@ -275,7 +278,8 @@ class TopBarWidget extends GrotEngine.Widget
             align: 'center'
             fontSize: cfg.fontScoMovSize
             fontFamily: cfg.fontFamily
-            fill: cfg.fontColor
+            fontStyle: cfg.fontStyle
+            fill: cfg.fontScoMovNumColor
 
         @movesDiff = new Kinetic.Text
             x: 450
@@ -284,7 +288,14 @@ class TopBarWidget extends GrotEngine.Widget
             align: 'center'
             fontSize: cfg.fontRestSize
             fontFamily: cfg.fontFamily
-            fill: cfg.fontColor
+            fill: cfg.fontScoMovNumColor
+
+        line = new Kinetic.Rect
+            x: 0
+            y: 200
+            width: 600
+            height: 2
+            fill: cfg.fontScoMovNumColor
 
         @centerElement(@scoreLabel)
         @centerElement(@score)
@@ -299,6 +310,7 @@ class TopBarWidget extends GrotEngine.Widget
         @add @movesLabel
         @add @moves
         @add @movesDiff
+        @add line
 
     update: () ->
         # update game stats
@@ -351,115 +363,538 @@ class BottomBarWidget extends GrotEngine.Widget
     label: null
     game: null
     help: null
+    menu: null
 
     constructor: (config) ->
         super
 
-        @label = new Kinetic.Text
-            x: 294
-            y: 860
-            text: 'Help'
-            align: 'center'
-            fontSize: cfg.fontRestSize
-            fontFamily: cfg.fontFamily
-            fill: cfg.fontColor
+        # group for help button
+        @buttonHelpGroup = new Kinetic.Group
+            x: 525
+            y: 800
 
-        @centerElement(@label)
-        @add @label
+        @circleHelp = new Kinetic.Circle
+            x: 20
+            y: 20
+            radius: 40
+            fill: cfg.circleColor4
 
-        imageObj = new Image()
-        imageObj.onload = () =>
-            @help = new Kinetic.Image
-                x: 90
-                y: 100
-                image: imageObj
-                width: 410
-                height: 730
+        @buttonHelpGroup.add @circleHelp
 
-            @help.hide()
-            @help.on 'mousedown touchstart', (event) =>
-                @help.hide()
-                @getLayer().draw()
+        # help layer
+        imageQuestionMarkObj = new Image()
+        imageQuestionMarkObj.onload = () =>
+            @imageQuestionMarkHelpLink = new Kinetic.Image
+                x: 0
+                y: 0
+                image: imageQuestionMarkObj
+                width: 40
+                height: 40
 
-            @add(@help)
+            @buttonHelpGroup.add @imageQuestionMarkHelpLink
+            @add @buttonHelpGroup
 
-        imageObj.src = 'img/help.png'
+        imageQuestionMarkObj.src = 'img/question-mark-icon.png'
 
-        @label.on 'mousedown touchstart', (event) =>
-            @help.moveToTop()
-            @help.show()
+        @buttonHelpGroup.on 'mousedown touchstart', (event) =>
+            config.game.renderManager.menuOverlay.helpWidget.draw()
+
+        heroImgObj = new Image()
+        heroImgObj.onload = () =>
+            @hero = new Kinetic.Image
+                x: 200
+                y: 740
+                image: heroImgObj
+                width: 180
+                height: 150
+
+            @add @hero
             @getLayer().draw()
 
-class GameOverWidget extends GrotEngine.Widget
-    # Bottom bar which displays help button
+        heroImgObj.src = 'img/hero.png'
 
-    gameOverLayer: null
-    game: null
+        # group for menu button
+        @buttonMenuGroup = new Kinetic.Group
+            x: 45
+            y: 800
 
-    constructor: (config) ->
+        @circleMenu = new Kinetic.Circle
+            x: 20
+            y: 20
+            radius: 40
+            fill: cfg.circleColor4
+
+        @rectMenu1 = new Kinetic.Rect
+            x: 5
+            y: 0
+            width: 10
+            height: 40
+            fill: cfg.fontMenuColor
+
+        @rectMenu2 = @rectMenu1.clone
+            x: 25
+
+        @buttonMenuGroup.add @circleMenu
+        @buttonMenuGroup.add @rectMenu1
+        @buttonMenuGroup.add @rectMenu2
+        @add @buttonMenuGroup
+
+        @buttonMenuGroup.on 'mousedown touchstart', (event) =>
+            config.game.renderManager.menuOverlay.menuWidget.draw()
+
+    centerText: (text) ->
+        # place label in center of widget
+        text.offsetX(text.width()/2)
+        text.offsetY(text.height()/2)
+
+    scale: (scale) ->
+        @scale {x: scale, y: scale}
+
+
+class MenuOverlay extends GrotEngine.Layer
+    # Menu, GameOver, Help widgets
+
+    constructor: ->
         super
 
-        @gameOverLayer = new Kinetic.Group
+        @gameOverWidget = new GameOverWidget
+        @add @gameOverWidget
 
-        background = new Kinetic.Rect
-            width: 82
-            height: 146
-            x: 10
-            y: 2
-            fill: cfg.gameOverMessageColor
-            opacity: 0.75
+        @menuWidget = new MenuWidget
+        @add @menuWidget
 
-        @gameOverMsg = new Kinetic.Text
-            x: 50
-            y: 50
-            text: ''
-            align: 'center'
-            fontSize: 8
-            fontFamily: cfg.fontFamily
-            fill: cfg.fontColor
+        @helpWidget = new HelpWidget
+        @add @helpWidget
 
-        @scoreBoardLink = new Kinetic.Text
-            x: 50
-            y: 100
-            text: 'GO TO\nSCORE BOARD'
-            align: 'center'
-            fontSize: 8
-            fontFamily: cfg.fontFamily
-            fill: 'red'
+    gameOverWidgetDraw: () ->
+        @gameOverWidget.fire 'eventGameOverDraw'
 
-        @resetGame = new Kinetic.Text
-            x: 24
-            y: 6
-            text: 'NEW GAME'
-            align: 'center'
-            fontSize: 5
-            fontStyle: 'Bold'
-            fontFamily: cfg.fontFamily
-            fill: 'blue'
+    menuWidgetDraw: () ->
+        @menuWidget.fire 'eventMenuDraw'
 
-        @scoreBoardLink.on 'mousedown touchstart', (event) =>
-            window.location.replace(cfg.scoreBoardLink)
+    helpWidgetDraw: () ->
+        @helpWidget.fire 'eventHelpDraw'
 
-        @resetGame.on 'mousedown touchstart', (event) =>
-            window.location.replace(window.location.href)
+    class GameOverWidget extends GrotEngine.Widget
+        # Game over widget
 
-        @centerElement(@scoreBoardLink)
-        @centerElement(@gameOverMsg)
-        @centerElement(@resetGame)
+        game: null
 
-        @gameOverLayer.add(background)
-        @gameOverLayer.add(@gameOverMsg)
-        @gameOverLayer.add(@scoreBoardLink)
-        @gameOverLayer.add(@resetGame)
+        constructor: (config) ->
+            super
 
-    draw: () =>
-        @add(@gameOverLayer)
-        @getLayer().draw()
+            @background = new Kinetic.Rect
+                width: 1700
+                height: 900
+                x: 0
+                y: 0
+                fill: cfg.gameOverMessageColor
+                opacity: 0.75
 
-    update: () ->
-        # update result for game over message
-        @gameOverMsg.setText('GAME OVER\nResult:\n' + @game.score)
-        @centerElement(@gameOverMsg)
+            @line = new Kinetic.Rect
+                x: 550
+                y: 200
+                width: 600
+                height: 2
+                fill: cfg.fontMenuColor
+
+            @gameOverMsg = new Kinetic.Text
+                x: 850
+                y: 125
+                text: 'Game Over'
+                align: 'center'
+                fontSize: 60
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+            @yourScoreMsg = new Kinetic.Text
+                x: 875
+                y: 300
+                text: 'Your Score:'
+                align: 'center'
+                fontSize: 40
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+            @scoreResult = new Kinetic.Text
+                x: 850
+                y: 350
+                text: ''
+                align: 'center'
+                fontSize: 35
+                fontfamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: '#00BFFF'
+
+            resetGameImageObj = new Image()
+            @resetGameImg = new Kinetic.Image
+                x: 685
+                y: 500
+                image: resetGameImageObj
+                width: 75
+                height: 75
+
+            @resetGameText = new Kinetic.Text
+                x: 725
+                y: 600
+                text: 'New Game'
+                align: 'center'
+                fontSize: 25
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+            scoreBoardImageObj = new Image()
+            @scoreBoardLinkImg = new Kinetic.Image
+                x: 960
+                y: 500
+                image: scoreBoardImageObj
+                width: 75
+                height: 75
+
+            @scoreBoardLinkText = new Kinetic.Text
+                x: 1000
+                y: 600
+                text: 'High scores'
+                align: 'center'
+                fontSize: 25
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+            resetGameImageObj.src = 'img/menu-new-game-icon.png'
+            scoreBoardImageObj.src = 'img/menu-high-score-icon.png'
+
+            @resetGameImg.on 'mousedown touchstart', (event) =>
+                window.location.replace(window.location.href)
+
+            @resetGameText.on 'mousedown touchstart', (event) =>
+                window.location.replace(window.location.href)
+
+            @scoreBoardLinkImg.on 'mousedown touchstart', (event) =>
+                window.location.replace(cfg.scoreBoardLink)
+
+            @scoreBoardLinkText.on 'mousedown touchstart', (event) =>
+                window.location.replace(cfg.scoreBoardLink)
+
+            @centerElement(@gameOverMsg)
+            @centerElement(@yourScoreMsg)
+            @centerElement(@resetGameText)
+            @centerElement(@scoreBoardLinkText)
+
+            @on 'eventGameOverDraw', @draw
+
+        draw: () =>
+            @add @background
+            @add @gameOverMsg
+            @add @line
+            @add @yourScoreMsg
+            @add @scoreResult
+            @add @resetGameImg
+            @add @resetGameText
+            @add @scoreBoardLinkImg
+            @add @scoreBoardLinkText
+            @getLayer().draw()
+
+        update: (result) ->
+            # update result for game over message
+            @scoreResult.setText(result)
+            @centerElement(@scoreResult)
+
+
+    class MenuWidget extends GrotEngine.Widget
+        # Menu widget
+
+        group: null
+        menuLayer: null
+        game: null
+
+        constructor: (config) ->
+            super
+
+            @background = new Kinetic.Rect
+                width: 1700
+                height: 900
+                x: 0
+                y: 0
+                fill: cfg.gameOverMessageColor
+                opacity: 0.75
+
+            @gameName = new Kinetic.Text
+                x: 785
+                y: 100
+                text: 'Grot'
+                align: 'center'
+                fontSize: 60
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+            @line = new Kinetic.Rect
+                x: 550
+                y: 200
+                width: 600
+                height: 2
+                fill: cfg.fontMenuColor
+
+            resetGameImageObj = new Image()
+            @resetGameImg = new Kinetic.Image
+                x: 685
+                y: 300
+                image: resetGameImageObj
+                width: 75
+                height: 75
+
+            @resetGameText = new Kinetic.Text
+                x: 660
+                y: 400
+                text: 'New Game'
+                align: 'center'
+                fontSize: 25
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+            scoreBoardImageObj = new Image()
+            @scoreBoardLinkImg = new Kinetic.Image
+                x: 960
+                y: 300
+                image: scoreBoardImageObj
+                width: 75
+                height: 75
+
+            @scoreBoardLinkText = new Kinetic.Text
+                x: 935
+                y: 400
+                text: 'High scores'
+                align: 'center'
+                fontSize: 25
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+            aboutImageObj = new Image()
+            @aboutImg = new Kinetic.Image
+                x: 685
+                y: 550
+                image: aboutImageObj
+                width: 75
+                height: 75
+
+            @aboutText = new Kinetic.Text
+                x: 685
+                y: 650
+                text: 'About'
+                align: 'center'
+                fontSize: 25
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+            resumeImageObj = new Image()
+            @resumeImg = new Kinetic.Image
+                x: 960
+                y: 550
+                image: resumeImageObj
+                width: 75
+                height: 75
+
+            @resumeText = new Kinetic.Text
+                x: 960
+                y: 650
+                text: 'Resume'
+                align: 'center'
+                fontSize: 25
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+
+            resetGameImageObj.src = 'img/menu-new-game-icon.png'
+            scoreBoardImageObj.src = 'img/menu-high-score-icon.png'
+            aboutImageObj.src = 'img/menu-about-icon.png'
+            resumeImageObj.src = 'img/menu-resume-icon.png'
+
+            @resetGameImg.on 'mousedown touchstart', (event) =>
+                window.location.replace(window.location.href)
+
+            @resetGameText.on 'mousedown touchstart', (event) =>
+                window.location.replace(window.location.href)
+
+            @scoreBoardLinkImg.on 'mousedown touchstart', (event) =>
+                window.location.replace(cfg.scoreBoardLink)
+
+            @scoreBoardLinkText.on 'mousedown touchstart', (event) =>
+                window.location.replace(cfg.scoreBoardLink)
+
+            @aboutImg.on 'mousedown touchstart', (event) =>
+                game.renderManager.menuOverlay.helpWidget.draw()
+
+            @aboutText.on 'mousedown touchstart', (event) =>
+                game.renderManager.menuOverlay.helpWidget.draw()
+
+            @resumeImg.on 'mousedown touchstart', (event) =>
+                @removeLay()
+
+            @resumeText.on 'mousedown touchstart', (event) =>
+                @removeLay()
+
+            @on 'eventMenuDraw', @draw
+
+        removeLay: () =>
+            @removeChildren()
+            @getLayer().draw()
+
+        draw: () =>
+            @add @background
+            @add @gameName
+            @add @line
+            @add @resetGameImg
+            @add @resetGameText
+            @add @scoreBoardLinkImg
+            @add @scoreBoardLinkText
+            @add @aboutImg
+            @add @aboutText
+            @add @resumeImg
+            @add @resumeText
+            @getLayer().draw()
+
+
+    class HelpWidget extends GrotEngine.Widget
+        # Game over widget
+
+        game: null
+
+        constructor: (config) ->
+            super
+
+            @background = new Kinetic.Rect
+                width: 1700
+                height: 900
+                x: 0
+                y: 0
+                fill: cfg.gameOverMessageColor
+                opacity: 0.75
+
+            @appName = new Kinetic.Text
+                x: 850
+                y: 50
+                fontSize: 80
+                fontFamily: cfg.fontFamily
+                text: 'GROT'
+                fill: cfg.fontMenuColor
+
+            @engAppName = @appName.clone
+                y: 100
+                fontSize: 40
+                text: '(eng. Arrowhead)'
+
+            @description = @appName.clone
+                y: 350
+                fontSize: 30
+                text: cfg.helpDesc
+
+            @points = @appName.clone
+                y: 625
+                fontSize: 30
+                text: 'Points'
+
+            @circle1 = new Kinetic.Circle
+                x: 575
+                y: 700
+                radius: 40
+                fill: cfg.circleColor1
+
+            @circlePoints1 = new Kinetic.Text
+                x: 625
+                y: 685
+                text: 'x1'
+                fill: cfg.fontMenuColor
+                fontSize: 30
+                fontFamily: cfg.fontFamily
+
+            @circle2 = @circle1.clone
+                x: 750
+                fill: cfg.circleColor2
+
+            @circlePoints2 = @circlePoints1.clone
+                x: 800
+                text: 'x2'
+
+            @circle3 = @circle1.clone
+                x: 925
+                fill: cfg.circleColor3
+
+            @circlePoints3 = @circlePoints1.clone
+                x: 975
+                text: 'x3'
+
+            @circle4 = @circle1.clone
+                x: 1100
+                fill: cfg.circleColor4
+
+            @circlePoints4 = @circlePoints1.clone
+                x: 1150
+                text: 'x4'
+
+            resumeImageObj = new Image()
+            @resumeImg = new Kinetic.Image
+                x: 850
+                y: 815
+                image: resumeImageObj
+                width: 75
+                height: 75
+
+            @resumeText = new Kinetic.Text
+                x: 850
+                y: 875
+                text: 'Resume'
+                align: 'center'
+                fontSize: 25
+                fontFamily: cfg.fontFamily
+                fontStyle: cfg.fontStyle
+                fill: cfg.fontMenuColor
+
+            resumeImageObj.src = 'img/menu-resume-icon.png'
+
+            @resumeImg.on 'mousedown touchstart', (event) =>
+                @removeLay()
+
+            @resumeText.on 'mousedown touchstart', (event) =>
+                @removeLay()
+
+            @on 'eventMenuDraw', @draw
+
+            @centerElement(@appName)
+            @centerElement(@engAppName)
+            @centerElement(@description)
+            @centerElement(@points)
+            @centerElement(@resumeImg)
+            @centerElement(@resumeText)
+
+        draw: () =>
+            @add @background
+            @add @appName
+            @add @engAppName
+            @add @description
+            @add @points
+            @add @circle1
+            @add @circlePoints1
+            @add @circle2
+            @add @circlePoints2
+            @add @circle3
+            @add @circlePoints3
+            @add @circle4
+            @add @circlePoints4
+            @add @resumeImg
+            @add @resumeText
+            @getLayer().draw()
+
+        removeLay: () =>
+            @removeChildren()
+            @getLayer().draw()
 
 
 class RenderManager extends GrotEngine.RenderManager
@@ -471,7 +906,6 @@ class RenderManager extends GrotEngine.RenderManager
     animLayer: null
     game: null
     topBarWidget: null
-    gameOverWidget: null
 
     constructor: (@boardSize, @game) ->
         [width, height] = @getWindowSize()
@@ -483,14 +917,15 @@ class RenderManager extends GrotEngine.RenderManager
         @stage = new Kinetic.Stage
             container: 'wrap'
             width: width
-            height: height - 8
+            height: height - 4
 
         @stage.on('onStageUpdated', @onStageUpdated.bind(@))
         @stage.fire('onStageUpdated')
 
         @stage.add @board
-        @stage.add @animLayer
         @stage.add @barsLayer
+        @stage.add @animLayer
+        @stage.add @menuOverlay
 
         super
 
@@ -521,12 +956,16 @@ class RenderManager extends GrotEngine.RenderManager
             height: 600
             renderManager: @
 
+        #create overlay for menu/gameover/help view
+        @menuOverlay = new MenuOverlay
+            renderManager: @
+            width: 1700
+            height: 900
+
     addWidgets: ->
         @topBarWidget = new TopBarWidget
             game: @game
         @bottomBarWidget = new BottomBarWidget
-            game: @game
-        @gameOverWidget = new GameOverWidget
             game: @game
 
         # add board fields to the layer
@@ -538,8 +977,6 @@ class RenderManager extends GrotEngine.RenderManager
 
         @barsLayer.add @topBarWidget
         @barsLayer.add @bottomBarWidget
-        @barsLayer.add @gameOverWidget
-
 
     moveFieldToLayer: (field, toLayer) ->
         # moves field to new layer
@@ -567,6 +1004,7 @@ class RenderManager extends GrotEngine.RenderManager
         @animLayer.y(@animLayer.initPos.y * @currentScale)
         @animLayer.centerLayer()
         @barsLayer.centerLayer()
+        @menuOverlay.centerLayer()
 
     listening: (state) ->
         # toggle listening for event on all field widgets
@@ -704,7 +1142,8 @@ class RenderManager extends GrotEngine.RenderManager
 
     gameOver: () ->
         # return message with scored result
-        @gameOverWidget.draw()
+        @menuOverlay.gameOverWidgetDraw()
+        # @menuOverlay.gameOverWidget.draw()
 
     finishMove: () ->
         # update game score
@@ -730,7 +1169,7 @@ class RenderManager extends GrotEngine.RenderManager
         else
             # game over
             console.log 'total score: ' + @game.score
-            @gameOverWidget.update()
+            @menuOverlay.gameOverWidget.update(@game.score)
             @gameOver(@game)
 
 
