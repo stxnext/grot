@@ -18,10 +18,10 @@ window.cfg =
   ###
   FieldWidget(Circle) settings
   ###
-  circleColor1: '#95a5a6'
-  circleColor2: '#2980b9'
-  circleColor3: '#27ae60'
-  circleColor4: '#e74c3c'
+  circleColor1: '#bab8b9'
+  circleColor2: '#ffec00'
+  circleColor3: '#868788'
+  circleColor4: '#00968f'
 
   circleRadius: 45
   spaceBetweenFields: 12
@@ -29,7 +29,7 @@ window.cfg =
   ###
   Arrow settings
   ###
-  arrowColor: '#333333'
+  arrowColor: '#ffffff'
 
   ###
   Tween duration
@@ -39,18 +39,35 @@ window.cfg =
   ###
   Font settings
   ###
-  fontColor: '#ecf0f1'
+  fontScoMovColor: '#868788'
+  fontScoMovNumColor: '#00968f'
+  fontMenuColor: '#ffffff'
   fontFamily: 'Courier New'
   fontScoMovSize: 46
   fontRestSize: 38
+  fontStyle: 'Bold'
 
   ###
   Background color settings
   ###
-  bodyColor: '#333333'
-  gameOverMessageColor: 'green'
+  bodyColor: '#ffffff'
+  gameOverMessageColor: '#333333'
 
   ###
   Urls settings
   ###
   scoreBoardLink: 'http://stxnext.pl/'
+
+  ###
+  Help description
+  ###
+  helpDesc: ' This logic game is about making\n
+            the most valuable chains possible!\n\n
+            Tap or click any field to start chain\n
+            reaction - fields will move one by\n
+            one in direction shown by\n
+            arrowheads.\n\n
+            Longer chains grant move bonuses.\n
+            Clear all fields in a row or in\n
+            a column to get extra points.\n\n
+            Collect as many points as possible!'

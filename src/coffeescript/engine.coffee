@@ -140,7 +140,7 @@ class Engine
 
                 @currentScale = @calculateScaleUnit()
                 @adaptStage()
-                
+
                 layers = @stage.getLayers()
                 for layer in layers
                     layer.fire 'update'
