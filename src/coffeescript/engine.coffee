@@ -159,3 +159,4 @@ class Engine
 
 
 window.GrotEngine = new Engine
+window.Grot = {}
