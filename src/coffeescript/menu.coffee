@@ -9,12 +9,12 @@ class Grot.MenuWidget extends GrotEngine.Widget
         super
 
         @background = new Kinetic.Rect
-            width: 1700
+            width: 1600
             height: 900
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.75
+            opacity: 0.85
 
         @gameName = new Kinetic.Text
             x: 785
@@ -124,22 +124,19 @@ class Grot.MenuWidget extends GrotEngine.Widget
             window.location.replace(cfg.scoreBoardLink)
 
         @aboutImg.on 'mousedown touchstart', (event) =>
-            game.renderManager.menuOverlay.helpWidget.draw()
+            @fire 'menuRemove'
+            @menuLayer.fire 'showHelp'
 
         @aboutText.on 'mousedown touchstart', (event) =>
-            game.renderManager.menuOverlay.helpWidget.draw()
+            @fire 'menuRemove'
+            @menuLayer.fire 'showHelp'
 
-        @resumeImg.on 'mousedown touchstart', (event) =>
-            @removeLay()
+        @resumeImg.on 'mousedown touchstart', @close
 
-        @resumeText.on 'mousedown touchstart', (event) =>
-            @removeLay()
+        @resumeText.on 'mousedown touchstart', @close
 
-        @on 'eventMenuDraw', @draw
-
-    removeLay: () =>
-        @removeChildren()
-        @getLayer().draw()
+        @on 'menuDraw', @draw
+        @on 'menuRemove', @close
 
     draw: () =>
         @add @background
@@ -155,21 +152,26 @@ class Grot.MenuWidget extends GrotEngine.Widget
         @add @resumeText
         @getLayer().draw()
 
+    close: () =>
+        @removeChildren()
+        @menuLayer.fire 'closeMenuOverlay'
+
 class Grot.GameOverWidget extends GrotEngine.Widget
     # Game over widget
 
     game: null
+    menuLayer: null
 
     constructor: (config) ->
         super
 
         @background = new Kinetic.Rect
-            width: 1700
+            width: 1600
             height: 900
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.75
+            opacity: 0.85
 
         @line = new Kinetic.Rect
             x: 550
@@ -264,9 +266,12 @@ class Grot.GameOverWidget extends GrotEngine.Widget
         @centerElement(@resetGameText)
         @centerElement(@scoreBoardLinkText)
 
-        @on 'eventGameOverDraw', @draw
+        @on 'gameOverDraw', @draw
+        @on 'gameOverRemove', @close
 
-    draw: () =>
+    draw: (score) =>
+        @scoreResult.setText(score)
+        @centerElement(@scoreResult)
         @add @background
         @add @gameOverMsg
         @add @line
@@ -278,26 +283,26 @@ class Grot.GameOverWidget extends GrotEngine.Widget
         @add @scoreBoardLinkText
         @getLayer().draw()
 
-    update: (result) ->
-        # update result for game over message
-        @scoreResult.setText(result)
-        @centerElement(@scoreResult)
+    close: () =>
+        @removeChildren()
+        @menuLayer.fire 'closeMenuOverlay'
 
 class Grot.HelpWidget extends GrotEngine.Widget
     # Game over widget
 
     game: null
+    menuLayer: null
 
     constructor: (config) ->
         super
 
         @background = new Kinetic.Rect
-            width: 1700
+            width: 1600
             height: 900
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.75
+            opacity: 0.85
 
         @appName = new Kinetic.Text
             x: 850
@@ -380,14 +385,16 @@ class Grot.HelpWidget extends GrotEngine.Widget
 
         resumeImageObj.src = 'img/menu-resume-icon.png'
 
-        @resumeImg.on 'mousedown touchstart', (event) =>
-            @removeLay()
+        @resumeImg.on 'mousedown touchstart', @close
+        @resumeText.on 'mousedown touchstart', @close
 
-        @resumeText.on 'mousedown touchstart', (event) =>
-            @removeLay()
+        @on 'helpDraw', @draw
+        @on 'helpRemove', @close
+        @on 'refresh', @refresh
+        @fire 'refresh'
 
-        @on 'eventMenuDraw', @draw
-
+    refresh: ->
+        @background.width(@menuLayer.canvas.width)
         @centerElement(@appName)
         @centerElement(@engAppName)
         @centerElement(@description)
@@ -413,9 +420,9 @@ class Grot.HelpWidget extends GrotEngine.Widget
         @add @resumeText
         @getLayer().draw()
 
-    removeLay: () =>
+    close: () =>
         @removeChildren()
-        @getLayer().draw()
+        @menuLayer.fire 'closeMenuOverlay'
 
 class Grot.MenuOverlay extends GrotEngine.Layer
     # Menu, GameOver, Help widgets
@@ -424,19 +431,52 @@ class Grot.MenuOverlay extends GrotEngine.Layer
         super
 
         @gameOverWidget = new Grot.GameOverWidget
-        @add @gameOverWidget
+            menuLayer: @
 
         @menuWidget = new Grot.MenuWidget
-        @add @menuWidget
+            menuLayer: @
 
         @helpWidget = new Grot.HelpWidget
-        @add @helpWidget
+            width: 1600
+            height: 900
+            menuLayer: @
 
-    gameOverWidgetDraw: () ->
-        @gameOverWidget.fire 'eventGameOverDraw'
+        @on 'showGameOver', @gameOverWidgetDraw
+        @on 'showMenu', @menuWidgetDraw
+        @on 'showHelp', @helpWidgetDraw
+        @on 'closeMenuOverlay', @closeMenuOverlay
+
+    closeMenuOverlay: ->
+        @removeChildren
+        @draw()
+
+    updateHandler: ->
+        ###
+        Override Engine update handler
+        ###
+
+        @currentScale = @renderManager.currentScale
+        @scale {x: @currentScale, y: @currentScale}
+
+        @rePosition()
+
+        width = ((@getWidth() * @currentScale) || @parent.getWidth()) + @getCurrentX()
+        height = ((@getHeight() * @currentScale) || @parent.getHeight()) + @getCurrentY()
+
+        @canvas.setSize(width, height)
+        @gameOverWidget.fire 'refresh'
+        @menuWidget.fire 'refresh'
+        @helpWidget.fire 'refresh'
+        @batchDraw()
+
+    gameOverWidgetDraw: (score) ->
+        @add @gameOverWidget
+        @gameOverWidget.fire 'gameOverDraw', score
 
     menuWidgetDraw: () ->
-        @menuWidget.fire 'eventMenuDraw'
+        @add @menuWidget
+        @menuWidget.fire 'menuDraw'
 
     helpWidgetDraw: () ->
-        @helpWidget.fire 'eventHelpDraw'
+        @add @helpWidget
+        @helpWidget.fire 'helpDraw'

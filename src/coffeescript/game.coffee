@@ -49,9 +49,9 @@ class RenderManager extends GrotEngine.RenderManager
         @stage.fire('onStageUpdated')
 
         @stage.add @board
-        @stage.add @menuOverlay
         @stage.add @barsLayer
         @stage.add @animLayer
+        @stage.add @menuOverlay
 
         super
 
@@ -63,12 +63,13 @@ class RenderManager extends GrotEngine.RenderManager
         @barsLayer = new GrotEngine.Layer
             width: 600
             height: 900
+            margins: {x: '50%', y: 0}
             renderManager: @
 
         @board = new Grot.Board
             size: @boardSize
             renderManager: @
-            initPos: {x: 0, y: 180}
+            margins: {x: '50%', y: 180}
             width: 600
             height: 600
 
@@ -77,7 +78,7 @@ class RenderManager extends GrotEngine.RenderManager
         # create next layers only for animations (better performance)
         @animLayer = new GrotEngine.Layer
             hitGraphEnabled: false
-            initPos: {x: 0, y: 180}
+            margins: {x: '50%', y: 180}
             width: 600
             height: 600
             renderManager: @
@@ -85,8 +86,6 @@ class RenderManager extends GrotEngine.RenderManager
         #create overlay for menu/gameover/help view
         @menuOverlay = new Grot.MenuOverlay
             renderManager: @
-            width: 1700
-            height: 900
 
     addWidgets: ->
         @topBarWidget = new Grot.TopBarWidget
@@ -125,12 +124,7 @@ class RenderManager extends GrotEngine.RenderManager
                     # set 'onClick' callback
                     widget.setupCallback(@startMove)
 
-        @board.y(@board.initPos.y * @currentScale)
-        @board.centerLayer()
-        @animLayer.y(@animLayer.initPos.y * @currentScale)
-        @animLayer.centerLayer()
-        @barsLayer.centerLayer()
-        @menuOverlay.centerLayer()
+        return
 
     listening: (state) ->
         # toggle listening for event on all field widgets
@@ -268,8 +262,7 @@ class RenderManager extends GrotEngine.RenderManager
 
     gameOver: () ->
         # return message with scored result
-        @menuOverlay.gameOverWidgetDraw()
-        # @menuOverlay.gameOverWidget.draw()
+        @menuOverlay.fire 'showGameOver', @game.score
 
     finishMove: () ->
         # update game score
@@ -294,8 +287,6 @@ class RenderManager extends GrotEngine.RenderManager
             @listening(true)
         else
             # game over
-            console.log 'total score: ' + @game.score
-            @menuOverlay.gameOverWidget.update(@game.score)
             @gameOver(@game)
 
 

@@ -58,7 +58,7 @@ class Engine
         class @Layer extends Kinetic.Layer
             renderManager: null
             currentScale: null
-            initPos: null
+            margins: null
 
             constructor: (config) ->
                 for field of config
@@ -67,24 +67,37 @@ class Engine
 
                 super
 
-                if !config.initPos
-                    @initPos = {x: 0, y: 0}
-
-                @canvas.setSize(@width, @height)
+                if !config.margins
+                    @margins = {x: 0, y: 0}
 
             updateHandler: (event) ->
                 @currentScale = @renderManager.currentScale
                 @scale {x: @currentScale, y: @currentScale}
 
-                width = (@getWidth() + @initPos.x) * @currentScale
-                height = (@getHeight() + @initPos.y) * @currentScale
+                @rePosition()
+
+                width = ((@getWidth() * @currentScale) || @parent.getWidth()) + @getCurrentX()
+                height = ((@getHeight() * @currentScale) || @parent.getHeight()) + @getCurrentY()
 
                 @canvas.setSize(width, height)
                 @batchDraw()
 
-            centerLayer: ->
-                @canvas._canvas.style.left = ((@renderManager.stage.getWidth() - @getWidth() * @renderManager.currentScale) / 2) + 'px'
+            getCurrentX: ->
+                return if typeof @margins.x is 'number' then @margins.x * @currentScale
+                else
+                    precentage = (@margins.x.match(/\d+/) || [0])[0] / 100
+                    (@parent.getWidth() - @getWidth() * @currentScale) * precentage
 
+            getCurrentY: ->
+                return if typeof @margins.y is 'number' then @margins.y * @currentScale
+                else
+                    precentage = (@margins.x.match(/\d+/) || [0])[0] / 100
+                    (@parent.getHeight() - @getHeight() * @currentScale) * precentage
+
+            rePosition: ->
+                @x(@getCurrentX())
+                @y(@getCurrentY())
+                return ([@x(), @y()])
 
         ###
         RenderManager class

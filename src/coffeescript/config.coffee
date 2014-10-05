@@ -23,8 +23,8 @@ window.cfg =
   circleColor3: '#868788'
   circleColor4: '#00968f'
 
-  circleRadius: 45
-  spaceBetweenFields: 12
+  circleRadius: 46
+  spaceBetweenFields: 13
 
   ###
   Arrow settings
@@ -34,7 +34,7 @@ window.cfg =
   ###
   Tween duration
   ###
-  tweenDuration: 0.5
+  tweenDuration: 0.4
 
   ###
   Font settings

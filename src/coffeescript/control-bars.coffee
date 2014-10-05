@@ -171,7 +171,7 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
         imageQuestionMarkObj.src = 'img/question-mark-icon.png'
 
         @buttonHelpGroup.on 'mousedown touchstart', (event) =>
-            config.game.renderManager.menuOverlay.helpWidget.draw()
+            game.renderManager.menuOverlay.fire 'showHelp'
 
         heroImgObj = new Image()
         heroImgObj.onload = () =>
@@ -214,7 +214,7 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
         @add @buttonMenuGroup
 
         @buttonMenuGroup.on 'mousedown touchstart', (event) =>
-            config.game.renderManager.menuOverlay.menuWidget.draw()
+            game.renderManager.menuOverlay.fire 'showMenu'
 
     centerText: (text) ->
         # place label in center of widget
