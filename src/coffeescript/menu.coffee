@@ -304,78 +304,94 @@ class Grot.HelpWidget extends GrotEngine.Widget
             fill: cfg.gameOverMessageColor
             opacity: 0.85
 
+        @container = new GrotEngine.Widget
+            width: 600
+            height: 900
+            margins: {x: '50%', y: 0}
+            layer: @menuLayer
+
         @appName = new Kinetic.Text
-            x: 850
+            x: 10
             y: 50
-            fontSize: 80
+            fontSize: 60
             fontFamily: cfg.fontFamily
             text: 'GROT'
             fill: cfg.fontMenuColor
 
         @engAppName = @appName.clone
-            y: 100
-            fontSize: 40
+            y: 110
+            x: 10
+            fontSize: 36
             text: '(eng. Arrowhead)'
 
         @description = @appName.clone
-            y: 350
-            fontSize: 30
+            y: 180
+            x: 10
+            width: 580
+            fontSize: 26
             text: cfg.helpDesc
 
         @points = @appName.clone
-            y: 625
+            y: 550
+            x: 25
             fontSize: 30
-            text: 'Points'
+            text: 'Points:'
+
+        @pointsVisualisation = new GrotEngine.Widget
+            width: 580
+            height: 42
+            x: 10
+            y: 600
 
         @circle1 = new Kinetic.Circle
-            x: 575
-            y: 700
+            x: 50
+            y: 50
             radius: 40
             fill: cfg.circleColor1
 
         @circlePoints1 = new Kinetic.Text
-            x: 625
-            y: 685
+            x: 100
+            y: 35
             text: 'x1'
             fill: cfg.fontMenuColor
             fontSize: 30
             fontFamily: cfg.fontFamily
 
         @circle2 = @circle1.clone
-            x: 750
+            x: 190
             fill: cfg.circleColor2
 
         @circlePoints2 = @circlePoints1.clone
-            x: 800
+            x: 240
             text: 'x2'
 
         @circle3 = @circle1.clone
-            x: 925
+            x: 330
             fill: cfg.circleColor3
 
         @circlePoints3 = @circlePoints1.clone
-            x: 975
+            x: 380
             text: 'x3'
 
         @circle4 = @circle1.clone
-            x: 1100
+            x: 470
             fill: cfg.circleColor4
 
         @circlePoints4 = @circlePoints1.clone
-            x: 1150
+            x: 520
             text: 'x4'
 
         resumeImageObj = new Image()
         @resumeImg = new Kinetic.Image
-            x: 850
-            y: 815
+            x: 265
+            y: 740
             image: resumeImageObj
             width: 75
             height: 75
 
         @resumeText = new Kinetic.Text
-            x: 850
-            y: 875
+            x: 260
+            y: 820
             text: 'Resume'
             align: 'center'
             fontSize: 25
@@ -390,34 +406,31 @@ class Grot.HelpWidget extends GrotEngine.Widget
 
         @on 'helpDraw', @draw
         @on 'helpRemove', @close
-        @on 'refresh', @refresh
-        @fire 'refresh'
+        @fire 'update'
 
-    refresh: ->
-        @background.width(@menuLayer.canvas.width)
-        @centerElement(@appName)
-        @centerElement(@engAppName)
-        @centerElement(@description)
-        @centerElement(@points)
-        @centerElement(@resumeImg)
-        @centerElement(@resumeText)
+    updateHandler: ->
+        if @menuLayer.parent
+            @background.width(@menuLayer.canvas.width / @menuLayer.currentScale)
+            @container.fire 'update'
 
     draw: () =>
         @add @background
-        @add @appName
-        @add @engAppName
-        @add @description
-        @add @points
-        @add @circle1
-        @add @circlePoints1
-        @add @circle2
-        @add @circlePoints2
-        @add @circle3
-        @add @circlePoints3
-        @add @circle4
-        @add @circlePoints4
-        @add @resumeImg
-        @add @resumeText
+        @add @container
+        @container.add @appName
+        @container.add @engAppName
+        @container.add @description
+        @container.add @points
+        @container.add @pointsVisualisation
+        @pointsVisualisation.add @circle1
+        @pointsVisualisation.add @circlePoints1
+        @pointsVisualisation.add @circle2
+        @pointsVisualisation.add @circlePoints2
+        @pointsVisualisation.add @circle3
+        @pointsVisualisation.add @circlePoints3
+        @pointsVisualisation.add @circle4
+        @pointsVisualisation.add @circlePoints4
+        @container.add @resumeImg
+        @container.add @resumeText
         @getLayer().draw()
 
     close: () =>
@@ -426,6 +439,8 @@ class Grot.HelpWidget extends GrotEngine.Widget
 
 class Grot.MenuOverlay extends GrotEngine.Layer
     # Menu, GameOver, Help widgets
+
+    renderManager: null
 
     constructor: ->
         super
@@ -437,8 +452,6 @@ class Grot.MenuOverlay extends GrotEngine.Layer
             menuLayer: @
 
         @helpWidget = new Grot.HelpWidget
-            width: 1600
-            height: 900
             menuLayer: @
 
         @on 'showGameOver', @gameOverWidgetDraw
@@ -451,23 +464,10 @@ class Grot.MenuOverlay extends GrotEngine.Layer
         @draw()
 
     updateHandler: ->
-        ###
-        Override Engine update handler
-        ###
-
-        @currentScale = @renderManager.currentScale
-        @scale {x: @currentScale, y: @currentScale}
-
-        @rePosition()
-
-        width = ((@getWidth() * @currentScale) || @parent.getWidth()) + @getCurrentX()
-        height = ((@getHeight() * @currentScale) || @parent.getHeight()) + @getCurrentY()
-
-        @canvas.setSize(width, height)
-        @gameOverWidget.fire 'refresh'
-        @menuWidget.fire 'refresh'
-        @helpWidget.fire 'refresh'
-        @batchDraw()
+        super
+        @gameOverWidget.fire 'update'
+        @menuWidget.fire 'update'
+        @helpWidget.fire 'update'
 
     gameOverWidgetDraw: (score) ->
         @add @gameOverWidget

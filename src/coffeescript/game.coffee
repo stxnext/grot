@@ -32,6 +32,7 @@ class RenderManager extends GrotEngine.RenderManager
     animLayer: null
     game: null
     topBarWidget: null
+    menuOverlay: null
 
     constructor: (@boardSize, @game) ->
         [width, height] = @getWindowSize()
