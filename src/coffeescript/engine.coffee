@@ -27,12 +27,43 @@ class Engine
 
         ###
         class @Widget extends Kinetic.Group
+            margins: null
+            currentScale: null
+            layer: null
+
             constructor: (config) ->
                 for field of config
                     if typeof @[field] != 'undefined' and typeof @[field] != 'function'
                         @[field] = config[field]
 
+                if !config.margins
+                    @margins = {x: 0, y: 0}
+
                 super
+
+                @on 'update', @updateHandler
+
+            getCurrentX: ->
+                return if typeof @margins.x is 'number' then @margins.x * @currentScale
+                else
+                    precentage = (@margins.x.match(/\d+/) || [0])[0] / 100
+                    (@layer.canvas.width - @getWidth() * @currentScale) / @currentScale * precentage
+
+            getCurrentY: ->
+                return if typeof @margins.y is 'number' then @margins.y * @currentScale
+                else
+                    precentage = (@margins.x.match(/\d+/) || [0])[0] / 100
+                    (@layer.canvas.height - @getHeight() * @currentScale) / @currentScale * precentage
+
+            rePosition: ->
+                @x(@getCurrentX())
+                @y(@getCurrentY())
+                return ([@x(), @y()])
+
+            updateHandler: (event) ->
+                if @layer
+                    @currentScale = @layer.currentScale
+                    @rePosition()
 
             scale: (scale) ->
                 if @group?
@@ -111,8 +142,7 @@ class Engine
             baseScale: if cfg.baseScale? then cfg.baseScale else 1
             baseWindowSize: if cfg.baseWindowSize? then cfg.baseWindowSize else null
             currentScale: null
-
-            widgets: {}
+            stage: null
 
             constructor: ->
                 if not @baseWindowSize?
