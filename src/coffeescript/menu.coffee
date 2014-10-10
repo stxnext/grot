@@ -14,7 +14,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.85
+            opacity: 0.95
 
         @container = new GrotEngine.Widget
             width: 600
@@ -184,7 +184,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.85
+            opacity: 0.95
 
         @container = new GrotEngine.Widget
             width: 600
@@ -327,7 +327,7 @@ class Grot.HelpWidget extends GrotEngine.Widget
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.85
+            opacity: 0.95
 
         @container = new GrotEngine.Widget
             width: 600

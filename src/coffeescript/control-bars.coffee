@@ -176,8 +176,8 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
         heroImgObj = new Image()
         heroImgObj.onload = () =>
             @hero = new Kinetic.Image
-                x: 200
-                y: 740
+                x: 210
+                y: 746
                 image: heroImgObj
                 width: 180
                 height: 150
