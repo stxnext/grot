@@ -12,6 +12,12 @@ class Grot.TopBarWidget extends GrotEngine.Widget
     constructor: (config) ->
         super
 
+        @background = new Kinetic.Rect
+            width: 600
+            height: 210
+            fill: cfg.bodyColor
+        @add @background
+
         @scoreLabel = new Kinetic.Text
             x: 150
             y: 50
@@ -141,6 +147,14 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
 
     constructor: (config) ->
         super
+
+        @background = new Kinetic.Rect
+            width: 600
+            height: 240
+            x: 0
+            y: 740
+            fill: cfg.bodyColor
+        @add @background
 
         # group for help button
         @buttonHelpGroup = new Kinetic.Group

@@ -14,7 +14,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.95
+            opacity: 0.9
 
         @container = new GrotEngine.Widget
             width: 600
@@ -184,7 +184,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.95
+            opacity: 0.9
 
         @container = new GrotEngine.Widget
             width: 600
@@ -327,7 +327,7 @@ class Grot.HelpWidget extends GrotEngine.Widget
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.95
+            opacity: 0.9
 
         @container = new GrotEngine.Widget
             width: 600
@@ -483,10 +483,15 @@ class Grot.MenuOverlay extends GrotEngine.Layer
         @on 'showMenu', @menuWidgetDraw
         @on 'showHelp', @helpWidgetDraw
         @on 'closeMenuOverlay', @closeMenuOverlay
+        @on 'onOverLayOpen', @onOverLayOpen
 
     closeMenuOverlay: ->
+        @renderManager.stage.fire 'normalizeBoardStuff'
         @removeChildren
         @draw()
+
+    onOverLayOpen: ->
+        @renderManager.stage.fire 'blurBoardStuff'
 
     updateHandler: ->
         super
@@ -495,13 +500,16 @@ class Grot.MenuOverlay extends GrotEngine.Layer
         @helpWidget.fire 'update'
 
     gameOverWidgetDraw: (score) ->
+        @fire 'onOverLayOpen'
         @add @gameOverWidget
         @gameOverWidget.fire 'gameOverDraw', score
 
     menuWidgetDraw: () ->
+        @fire 'onOverLayOpen'
         @add @menuWidget
         @menuWidget.fire 'menuDraw'
 
     helpWidgetDraw: () ->
+        @fire 'onOverLayOpen'
         @add @helpWidget
         @helpWidget.fire 'helpDraw'

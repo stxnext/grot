@@ -128,6 +128,12 @@ class Grot.Board extends GrotEngine.Layer
     constructor: (config) ->
         super
 
+        @background = new Kinetic.Rect
+            width: config.width
+            height: config.height
+            fill: cfg.bodyColor
+        @add @background
+
         @fieldRelativeScale = 5 / @size
         @createBoard @size
 
