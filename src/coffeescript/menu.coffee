@@ -16,8 +16,14 @@ class Grot.MenuWidget extends GrotEngine.Widget
             fill: cfg.gameOverMessageColor
             opacity: 0.85
 
+        @container = new GrotEngine.Widget
+            width: 600
+            height: 900
+            margins: {x: '50%', y: 0}
+            layer: @menuLayer
+
         @gameName = new Kinetic.Text
-            x: 785
+            x: 235
             y: 100
             text: 'Grot'
             align: 'center'
@@ -27,7 +33,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             fill: cfg.fontMenuColor
 
         @line = new Kinetic.Rect
-            x: 550
+            x: 0
             y: 200
             width: 600
             height: 2
@@ -35,14 +41,14 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
         resetGameImageObj = new Image()
         @resetGameImg = new Kinetic.Image
-            x: 685
+            x: 125
             y: 300
             image: resetGameImageObj
             width: 75
             height: 75
 
         @resetGameText = new Kinetic.Text
-            x: 660
+            x: 110
             y: 400
             text: 'New Game'
             align: 'center'
@@ -53,14 +59,14 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
         scoreBoardImageObj = new Image()
         @scoreBoardLinkImg = new Kinetic.Image
-            x: 960
+            x: 410
             y: 300
             image: scoreBoardImageObj
             width: 75
             height: 75
 
         @scoreBoardLinkText = new Kinetic.Text
-            x: 935
+            x: 365
             y: 400
             text: 'High scores'
             align: 'center'
@@ -71,14 +77,14 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
         aboutImageObj = new Image()
         @aboutImg = new Kinetic.Image
-            x: 685
+            x: 135
             y: 550
             image: aboutImageObj
             width: 75
             height: 75
 
         @aboutText = new Kinetic.Text
-            x: 685
+            x: 135
             y: 650
             text: 'About'
             align: 'center'
@@ -89,14 +95,14 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
         resumeImageObj = new Image()
         @resumeImg = new Kinetic.Image
-            x: 960
+            x: 410
             y: 550
             image: resumeImageObj
             width: 75
             height: 75
 
         @resumeText = new Kinetic.Text
-            x: 960
+            x: 410
             y: 650
             text: 'Resume'
             align: 'center'
@@ -137,19 +143,26 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
         @on 'menuDraw', @draw
         @on 'menuRemove', @close
+        @fire 'update'
+
+    updateHandler: ->
+        if @menuLayer.parent
+            @background.width(@menuLayer.canvas.width / @menuLayer.currentScale)
+            @container.fire 'update'
 
     draw: () =>
         @add @background
-        @add @gameName
-        @add @line
-        @add @resetGameImg
-        @add @resetGameText
-        @add @scoreBoardLinkImg
-        @add @scoreBoardLinkText
-        @add @aboutImg
-        @add @aboutText
-        @add @resumeImg
-        @add @resumeText
+        @add @container
+        @container.add @gameName
+        @container.add @line
+        @container.add @resetGameImg
+        @container.add @resetGameText
+        @container.add @scoreBoardLinkImg
+        @container.add @scoreBoardLinkText
+        @container.add @aboutImg
+        @container.add @aboutText
+        @container.add @resumeImg
+        @container.add @resumeText
         @getLayer().draw()
 
     close: () =>
@@ -173,15 +186,21 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             fill: cfg.gameOverMessageColor
             opacity: 0.85
 
+        @container = new GrotEngine.Widget
+            width: 600
+            height: 900
+            margins: {x: '50%', y: 0}
+            layer: @menuLayer
+
         @line = new Kinetic.Rect
-            x: 550
+            x: 0
             y: 200
             width: 600
             height: 2
             fill: cfg.fontMenuColor
 
         @gameOverMsg = new Kinetic.Text
-            x: 850
+            x: 300
             y: 125
             text: 'Game Over'
             align: 'center'
@@ -191,7 +210,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             fill: cfg.fontMenuColor
 
         @yourScoreMsg = new Kinetic.Text
-            x: 875
+            x: 325
             y: 300
             text: 'Your Score:'
             align: 'center'
@@ -201,7 +220,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             fill: cfg.fontMenuColor
 
         @scoreResult = new Kinetic.Text
-            x: 850
+            x: 300
             y: 350
             text: ''
             align: 'center'
@@ -212,14 +231,14 @@ class Grot.GameOverWidget extends GrotEngine.Widget
 
         resetGameImageObj = new Image()
         @resetGameImg = new Kinetic.Image
-            x: 685
+            x: 135
             y: 500
             image: resetGameImageObj
             width: 75
             height: 75
 
         @resetGameText = new Kinetic.Text
-            x: 725
+            x: 175
             y: 600
             text: 'New Game'
             align: 'center'
@@ -230,14 +249,14 @@ class Grot.GameOverWidget extends GrotEngine.Widget
 
         scoreBoardImageObj = new Image()
         @scoreBoardLinkImg = new Kinetic.Image
-            x: 960
+            x: 410
             y: 500
             image: scoreBoardImageObj
             width: 75
             height: 75
 
         @scoreBoardLinkText = new Kinetic.Text
-            x: 1000
+            x: 450
             y: 600
             text: 'High scores'
             align: 'center'
@@ -269,18 +288,24 @@ class Grot.GameOverWidget extends GrotEngine.Widget
         @on 'gameOverDraw', @draw
         @on 'gameOverRemove', @close
 
+    updateHandler: ->
+        if @menuLayer.parent
+            @background.width(@menuLayer.canvas.width / @menuLayer.currentScale)
+            @container.fire 'update'
+
     draw: (score) =>
         @scoreResult.setText(score)
         @centerElement(@scoreResult)
         @add @background
-        @add @gameOverMsg
-        @add @line
-        @add @yourScoreMsg
-        @add @scoreResult
-        @add @resetGameImg
-        @add @resetGameText
-        @add @scoreBoardLinkImg
-        @add @scoreBoardLinkText
+        @add @container
+        @container.add @gameOverMsg
+        @container.add @line
+        @container.add @yourScoreMsg
+        @container.add @scoreResult
+        @container.add @resetGameImg
+        @container.add @resetGameText
+        @container.add @scoreBoardLinkImg
+        @container.add @scoreBoardLinkText
         @getLayer().draw()
 
     close: () =>

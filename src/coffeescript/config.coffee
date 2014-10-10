@@ -24,7 +24,7 @@ window.cfg =
   circleColor4: '#00968f'
 
   circleRadius: 46
-  spaceBetweenFields: 13
+  spaceBetweenFields: 12
 
   ###
   Arrow settings
