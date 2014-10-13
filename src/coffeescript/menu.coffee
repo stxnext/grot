@@ -14,7 +14,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.95
+            opacity: 0.9
 
         @container = new GrotEngine.Widget
             width: 600
@@ -48,7 +48,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             height: 75
 
         @resetGameText = new Kinetic.Text
-            x: 110
+            x: 100
             y: 400
             text: 'New Game'
             align: 'center'
@@ -66,7 +66,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             height: 75
 
         @scoreBoardLinkText = new Kinetic.Text
-            x: 365
+            x: 385
             y: 400
             text: 'High scores'
             align: 'center'
@@ -84,7 +84,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             height: 75
 
         @aboutText = new Kinetic.Text
-            x: 135
+            x: 140
             y: 650
             text: 'About'
             align: 'center'
@@ -102,7 +102,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             height: 75
 
         @resumeText = new Kinetic.Text
-            x: 410
+            x: 405
             y: 650
             text: 'Resume'
             align: 'center'
@@ -184,7 +184,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.95
+            opacity: 0.9
 
         @container = new GrotEngine.Widget
             width: 600
@@ -200,7 +200,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             fill: cfg.fontMenuColor
 
         @gameOverMsg = new Kinetic.Text
-            x: 300
+            x: 320
             y: 125
             text: 'Game Over'
             align: 'center'
@@ -210,7 +210,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             fill: cfg.fontMenuColor
 
         @yourScoreMsg = new Kinetic.Text
-            x: 325
+            x: 315
             y: 300
             text: 'Your Score:'
             align: 'center'
@@ -238,7 +238,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             height: 75
 
         @resetGameText = new Kinetic.Text
-            x: 175
+            x: 180
             y: 600
             text: 'New Game'
             align: 'center'
@@ -256,7 +256,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             height: 75
 
         @scoreBoardLinkText = new Kinetic.Text
-            x: 450
+            x: 460
             y: 600
             text: 'High scores'
             align: 'center'
@@ -327,7 +327,7 @@ class Grot.HelpWidget extends GrotEngine.Widget
             x: 0
             y: 0
             fill: cfg.gameOverMessageColor
-            opacity: 0.95
+            opacity: 0.9
 
         @container = new GrotEngine.Widget
             width: 600
@@ -483,10 +483,15 @@ class Grot.MenuOverlay extends GrotEngine.Layer
         @on 'showMenu', @menuWidgetDraw
         @on 'showHelp', @helpWidgetDraw
         @on 'closeMenuOverlay', @closeMenuOverlay
+        @on 'onOverLayOpen', @onOverLayOpen
 
     closeMenuOverlay: ->
+        @renderManager.stage.fire 'normalizeBoardStuff'
         @removeChildren
         @draw()
+
+    onOverLayOpen: ->
+        @renderManager.stage.fire 'blurBoardStuff'
 
     updateHandler: ->
         super
@@ -495,13 +500,16 @@ class Grot.MenuOverlay extends GrotEngine.Layer
         @helpWidget.fire 'update'
 
     gameOverWidgetDraw: (score) ->
+        @fire 'onOverLayOpen'
         @add @gameOverWidget
         @gameOverWidget.fire 'gameOverDraw', score
 
     menuWidgetDraw: () ->
+        @fire 'onOverLayOpen'
         @add @menuWidget
         @menuWidget.fire 'menuDraw'
 
     helpWidgetDraw: () ->
+        @fire 'onOverLayOpen'
         @add @helpWidget
         @helpWidget.fire 'helpDraw'

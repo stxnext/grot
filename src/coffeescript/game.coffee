@@ -46,13 +46,19 @@ class RenderManager extends GrotEngine.RenderManager
             width: width
             height: height - 4
 
-        @stage.on('onStageUpdated', @onStageUpdated.bind(@))
-        @stage.fire('onStageUpdated')
+        @stage.on 'onStageUpdated', @onStageUpdated.bind(@)
+        @stage.on 'blurBoardStuff', @blurBoardStuff.bind(@)
+        @stage.on 'normalizeBoardStuff', @normalizeBoardStuff.bind(@)
+
+        @stage.fire 'onStageUpdated'
 
         @stage.add @board
         @stage.add @barsLayer
         @stage.add @animLayer
         @stage.add @menuOverlay
+
+        @barsLayer.filters [Kinetic.Filters.Blur]
+        @board.filters [Kinetic.Filters.Blur]
 
         super
 
@@ -103,6 +109,22 @@ class RenderManager extends GrotEngine.RenderManager
 
         @barsLayer.add @topBarWidget
         @barsLayer.add @bottomBarWidget
+
+    normalizeBoardStuff: ->
+        @barsLayer.blurRadius 0
+        @board.blurRadius 0
+        @board.clearCache()
+        @barsLayer.clearCache()
+        @barsLayer.batchDraw()
+        @board.batchDraw()
+
+    blurBoardStuff: ->
+        @barsLayer.cache()
+        @board.cache()
+        @barsLayer.blurRadius 10
+        @board.blurRadius 10
+        @barsLayer.batchDraw()
+        @board.batchDraw()
 
     moveFieldToLayer: (field, toLayer) ->
         # moves field to new layer

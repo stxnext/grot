@@ -42,7 +42,7 @@ window.cfg =
   fontScoMovColor: '#868788'
   fontScoMovNumColor: '#00968f'
   fontMenuColor: '#ffffff'
-  fontFamily: 'Courier New'
+  fontFamily: 'Lato'
   fontScoMovSize: 46
   fontRestSize: 38
   fontStyle: 'Bold'
@@ -61,13 +61,12 @@ window.cfg =
   ###
   Help description
   ###
-  helpDesc: ' This logic game is about making\n
-            the most valuable chains possible!\n\n
-            Tap or click any field to start\n
-            chain reaction - fields will move\n
-            one by one in direction shown by\n
-            arrowheads.\n\n
+  helpDesc: ' This logic game is about making the most\n
+            valuable chains possible!\n\n
+            Tap or click any field to start chain\n
+            reaction - fields will move one by one in\n
+            direction shown by arrowheads.\n\n
             Longer chains grant move bonuses.\n
-            Clear all fields in a row or in\n
-            a column to get extra points.\n\n
+            Clear all fields in a row or in a column\n
+            to get extra points.\n\n
             Collect as many points as possible!'
