@@ -122,7 +122,7 @@ class RenderManager extends GrotEngine.RenderManager
         @barsLayer.cache()
         @board.cache()
         @barsLayer.blurRadius 10
-        @board.blurRadius 10;
+        @board.blurRadius 10
         @barsLayer.batchDraw()
         @board.batchDraw()
 
