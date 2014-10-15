@@ -98,15 +98,16 @@ class Grot.TopBarWidget extends GrotEngine.Widget
         @add @movesDiff
         @add line
 
-    delay1s: () =>
-        tween = new Kinetic.Tween
-            node: @scoreDiff
-            opacity: 0
-            duration: TWEEN_DURATION
-            onFinish: ->
-                @destroy()
+    delayAnim: (diff) =>
+        delay1s =>
+            tween = new Kinetic.Tween
+                node: diff
+                opacity: 0
+                duration: TWEEN_DURATION
+                onFinish: ->
+                    @destroy()
 
-        tween.play()
+            tween.play()
 
     update: () ->
         # update game stats
@@ -117,8 +118,7 @@ class Grot.TopBarWidget extends GrotEngine.Widget
             # if new value of scoreDiff than show it and after that fade it out
             @scoreDiff.setText('+'+@game.scoreDiff)
             @scoreDiff.opacity(1)
-
-            @delay1s()
+            @delayAnim @scoreDiff
 
         @moves.setText(@game.moves)
         if @game.movesDiff == 0
@@ -127,8 +127,7 @@ class Grot.TopBarWidget extends GrotEngine.Widget
             # if new value of movesDiff than show it and after that fade it out
             @movesDiff.setText('+'+@game.movesDiff)
             @movesDiff.opacity(1)
-
-            @delay1s()
+            @delayAnim @movesDiff
 
         @centerElement(@score)
         @centerElement(@scoreDiff)

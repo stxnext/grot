@@ -1,8 +1,7 @@
 # GROT - html5 canvas game
 
-TWEEN_DURATION = cfg.tweenDuration
-
-delay1s = (func) -> setTimeout func, 1000
+window.TWEEN_DURATION = cfg.tweenDuration
+window.delay1s = (func) -> setTimeout func, 1000
 
 window.randomChoice = (values) ->
     # http://rosettacode.org/wiki/Pick_random_element#CoffeeScript

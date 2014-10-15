@@ -34,7 +34,7 @@ window.cfg =
   ###
   Tween duration
   ###
-  tweenDuration: 0.4
+  tweenDuration: 0.5
 
   ###
   Font settings
