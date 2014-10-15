@@ -7,9 +7,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <!-- build:js js/kinetic.js -->
         <script type="text/javascript" src="js/kinetic-v5.0.2.min.js"></script>
-        <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
         <!-- endbuild -->
         <style>
+            /* latin-ext */
+            @font-face {
+              font-family: 'Lato';
+              font-style: normal;
+              font-weight: 400;
+              src: local('Lato Regular'), local('Lato-Regular'), url(fonts/LatoRegular-latin-ext.woff) format('woff');
+            }
             body {
                 overflow: hidden;
             }
@@ -30,9 +36,9 @@
         <!-- build:js js/grot.js -->
         <script type="text/javascript" src="js/config.js"></script>
         <script type="text/javascript" src="js/engine.js"></script>
+        <script type="text/javascript" src="js/control-bars.js"></script>
         <script type="text/javascript" src="js/arrow.js"></script>
         <script type="text/javascript" src="js/board.js"></script>
-        <script type="text/javascript" src="js/control-bars.js"></script>
         <script type="text/javascript" src="js/menu.js"></script>
         <script type="text/javascript" src="js/game.js"></script>
         <!-- endbuild -->

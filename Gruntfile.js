@@ -95,6 +95,14 @@ module.exports = function (grunt) {
                 },{
                     expand: true,
                     dot: true,
+                    cwd: '<%= app.src %>/fonts',
+                    dest: '<%= app.tmp %>/fonts/',
+                    src: [
+                        '*',
+                    ]
+                },{
+                    expand: true,
+                    dot: true,
                     cwd: '<%= app.src %>/html',
                     src: '*.html',
                     dest: '<%= app.tmp %>'
@@ -109,6 +117,14 @@ module.exports = function (grunt) {
                     dest: '<%= app.build %>/img',
                     src: [
                         '{,*/}*.{png,jpg,jpeg}',
+                    ]
+                },{
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= app.src %>/fonts',
+                    dest: '<%= app.build %>/fonts/',
+                    src: [
+                        '*',
                     ]
                 },{
                     expand: true,

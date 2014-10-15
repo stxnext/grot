@@ -84,7 +84,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             height: 75
 
         @aboutText = new Kinetic.Text
-            x: 130
+            x: 128
             y: 650
             text: 'About'
             align: 'center'
@@ -102,7 +102,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
             height: 75
 
         @resumeText = new Kinetic.Text
-            x: 405
+            x: 402
             y: 650
             text: 'Resume'
             align: 'center'
@@ -239,7 +239,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
 
         @resetGameText = new Kinetic.Text
             x: 180
-            y: 600
+            y: 610
             text: 'New Game'
             align: 'center'
             fontSize: 25
@@ -256,8 +256,8 @@ class Grot.GameOverWidget extends GrotEngine.Widget
             height: 75
 
         @scoreBoardLinkText = new Kinetic.Text
-            x: 460
-            y: 600
+            x: 455
+            y: 610
             text: 'High scores'
             align: 'center'
             fontSize: 25
@@ -415,7 +415,7 @@ class Grot.HelpWidget extends GrotEngine.Widget
             height: 75
 
         @resumeText = new Kinetic.Text
-            x: 260
+            x: 258
             y: 820
             text: 'Resume'
             align: 'center'
