@@ -163,7 +163,7 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
 
         @circleHelp = new Kinetic.Circle
             x: 20
-            y: 20
+            y: 30
             radius: 40
             fill: cfg.circleColor4
 
@@ -173,11 +173,11 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
         imageQuestionMarkObj = new Image()
         imageQuestionMarkObj.onload = () =>
             @imageQuestionMarkHelpLink = new Kinetic.Image
-                x: 0
-                y: 0
+                x: 2
+                y: 6
                 image: imageQuestionMarkObj
                 width: 40
-                height: 40
+                height: 56
 
             @buttonHelpGroup.add @imageQuestionMarkHelpLink
             @add @buttonHelpGroup
@@ -208,13 +208,13 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
 
         @circleMenu = new Kinetic.Circle
             x: 20
-            y: 20
+            y: 30
             radius: 40
             fill: cfg.circleColor4
 
         @rectMenu1 = new Kinetic.Rect
             x: 5
-            y: 0
+            y: 10
             width: 10
             height: 40
             fill: cfg.fontMenuColor

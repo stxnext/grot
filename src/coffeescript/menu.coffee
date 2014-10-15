@@ -77,14 +77,14 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
         aboutImageObj = new Image()
         @aboutImg = new Kinetic.Image
-            x: 135
+            x: 125
             y: 550
             image: aboutImageObj
             width: 75
             height: 75
 
         @aboutText = new Kinetic.Text
-            x: 140
+            x: 130
             y: 650
             text: 'About'
             align: 'center'
