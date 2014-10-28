@@ -63,9 +63,9 @@ window.cfg =
   ###
   helpDesc: ' This logic game is about making the most\n
             valuable chains possible!\n\n
-            Tap or click any field to start chain\n
+            Tap or click any field to start a chain\n
             reaction - fields will move one by one in\n
-            direction shown by arrowheads.\n\n
+            the direction shown by the arrowheads.\n\n
             Longer chains grant move bonuses.\n
             Clear all fields in a row or in a column\n
             to get extra points.\n\n
