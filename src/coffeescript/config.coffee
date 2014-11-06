@@ -18,9 +18,9 @@ window.cfg =
   ###
   FieldWidget(Circle) settings
   ###
-  circleColor1: '#bab8b9'
+  circleColor1: '#868788'
   circleColor2: '#ffec00'
-  circleColor3: '#868788'
+  circleColor3: '#8d198f'
   circleColor4: '#00968f'
 
   circleRadius: 46
