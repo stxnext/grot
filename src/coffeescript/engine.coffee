@@ -47,13 +47,13 @@ class Engine
                 return if typeof @margins.x is 'number' then @margins.x * @currentScale
                 else
                     precentage = (@margins.x.match(/\d+/) || [0])[0] / 100
-                    (@layer.canvas.width - @getWidth() * @currentScale) / @currentScale * precentage
+                    (@layer.canvas.width / window.devicePixelRatio - @getWidth() * @currentScale) / @currentScale * precentage
 
             getCurrentY: ->
                 return if typeof @margins.y is 'number' then @margins.y * @currentScale
                 else
                     precentage = (@margins.x.match(/\d+/) || [0])[0] / 100
-                    (@layer.canvas.height - @getHeight() * @currentScale) / @currentScale * precentage
+                    (@layer.canvas.height / window.devicePixelRatio - @getHeight() * @currentScale) / @currentScale * precentage
 
             rePosition: ->
                 @x(@getCurrentX())

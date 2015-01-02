@@ -147,7 +147,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
     updateHandler: ->
         if @menuLayer.parent
-            @background.width(@menuLayer.canvas.width / @menuLayer.currentScale)
+            @background.width(@menuLayer.canvas.width / window.devicePixelRatio / @menuLayer.currentScale)
             @container.fire 'update'
 
     draw: () =>
@@ -290,7 +290,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
 
     updateHandler: ->
         if @menuLayer.parent
-            @background.width(@menuLayer.canvas.width / @menuLayer.currentScale)
+            @background.width(@menuLayer.canvas.width / window.devicePixelRatio / @menuLayer.currentScale)
             @container.fire 'update'
 
     draw: (score) =>
@@ -435,7 +435,7 @@ class Grot.HelpWidget extends GrotEngine.Widget
 
     updateHandler: ->
         if @menuLayer.parent
-            @background.width(@menuLayer.canvas.width / @menuLayer.currentScale)
+            @background.width(@menuLayer.canvas.width / window.devicePixelRatio / @menuLayer.currentScale)
             @container.fire 'update'
 
     draw: () =>
