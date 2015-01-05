@@ -323,10 +323,10 @@ class Game extends GrotEngine.Game
     constructor: () ->
         super
 
-        qs = (new QueryString).get('size')
+        qsSize = parseInt((new QueryString).get('size'))
 
-        boardSize = if cfg.customBoardSize and qs
-        then qs else cfg.defaultBoardSize
+        boardSize = if cfg.customBoardSize and qsSize
+        then qsSize else cfg.defaultBoardSize
 
         @renderManager = new RenderManager boardSize, @
 
