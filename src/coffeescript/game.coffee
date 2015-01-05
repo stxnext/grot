@@ -69,13 +69,13 @@ class RenderManager extends GrotEngine.RenderManager
         @barsLayer = new GrotEngine.Layer
             width: 600
             height: 900
-            margins: {x: '50%', y: 0}
+            margins: {x: 0, y: 0}
             renderManager: @
 
         @board = new Grot.Board
             size: @boardSize
             renderManager: @
-            margins: {x: '50%', y: 180}
+            margins: {x: 0, y: 180}
             width: 600
             height: 600
 
@@ -84,13 +84,16 @@ class RenderManager extends GrotEngine.RenderManager
         # create next layers only for animations (better performance)
         @animLayer = new GrotEngine.Layer
             hitGraphEnabled: false
-            margins: {x: '50%', y: 180}
+            margins: {x: 0, y: 180}
             width: 600
             height: 600
             renderManager: @
 
         #create overlay for menu/gameover/help view
         @menuOverlay = new Grot.MenuOverlay
+            width: 600
+            height: 900
+            margins: {x: 0, y: 0}
             renderManager: @
 
     addWidgets: ->

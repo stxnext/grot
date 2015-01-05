@@ -44,16 +44,10 @@ class Engine
                 @on 'update', @updateHandler
 
             getCurrentX: ->
-                return if typeof @margins.x is 'number' then @margins.x * @currentScale
-                else
-                    precentage = (@margins.x.match(/\d+/) || [0])[0] / 100
-                    (@layer.canvas.width / window.devicePixelRatio - @getWidth() * @currentScale) / @currentScale * precentage
+                return  @margins.x * @currentScale
 
             getCurrentY: ->
-                return if typeof @margins.y is 'number' then @margins.y * @currentScale
-                else
-                    precentage = (@margins.x.match(/\d+/) || [0])[0] / 100
-                    (@layer.canvas.height / window.devicePixelRatio - @getHeight() * @currentScale) / @currentScale * precentage
+                return @margins.y * @currentScale
 
             rePosition: ->
                 @x(@getCurrentX())
@@ -157,6 +151,9 @@ class Engine
                 layers = @stage.getLayers()
                 for layer in layers
                     layer.on('update', layer.updateHandler)
+                    layer.fire 'update'
+
+                @updateMargin()
 
             getWindowSize: ->
                 return [window.innerWidth, window.innerHeight]
@@ -164,14 +161,28 @@ class Engine
             calculateScaleUnit: ->
                 [width, height] = @getWindowSize()
 
-                scale = if width < height? then width / @baseWindowSize.width
-                else height / @baseWindowSize.height
+                gameAspectRatio = 600 / 900
+                windowAspectRatio = width / height
+
+                if (windowAspectRatio > gameAspectRatio)
+                    scale = (height / gameAspectRatio) / @baseWindowSize.width * 1.2
+                else
+                    scale = (width / gameAspectRatio) / @baseWindowSize.height
 
                 return Number(scale.toFixed(2))
 
+            updateMargin: ->
+                maxWidth = 0
+                layers = @stage.getLayers()
+                for layer in layers
+                    maxWidth = Math.max(maxWidth, layer.canvas.width / layer.canvas.getPixelRatio())
+
+                marginWidth = Math.ceil((@getWindowSize()[0] - maxWidth)/2)
+                marginWidth = Math.max(marginWidth, 0)
+                @stage.getContainer().style.marginLeft = marginWidth + 'px'
+
             centerLayer: (layer) ->
                 layer.offsetX(-(@stage.getWidth() - layer.getWidth()) / 2)
-
 
             adaptStage: () ->
                 [width, height] = @getWindowSize()
@@ -189,6 +200,8 @@ class Engine
                     layer.fire 'update'
 
                 @stage.fire 'onStageUpdated'
+
+                @updateMargin()
 
 
         class @Game
