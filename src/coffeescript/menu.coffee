@@ -9,23 +9,23 @@ class Grot.MenuWidget extends GrotEngine.Widget
         super
 
         @background = new Kinetic.Rect
-            width: 1600
+            width: 600
             height: 900
             x: 0
             y: 0
-            fill: cfg.gameOverMessageColor
+            fill: cfg.overlayColor
             opacity: 0.9
 
         @container = new GrotEngine.Widget
             width: 600
             height: 900
-            margins: {x: '50%', y: 0}
+            margins: {x: 0, y: 0}
             layer: @menuLayer
 
         @gameName = new Kinetic.Text
             x: 235
             y: 100
-            text: 'Grot'
+            text: 'GROT'
             align: 'center'
             fontSize: 60
             fontFamily: cfg.fontFamily
@@ -75,16 +75,34 @@ class Grot.MenuWidget extends GrotEngine.Widget
             fontStyle: cfg.fontStyle
             fill: cfg.fontMenuColor
 
+        helpImageObj = new Image()
+        @helpImage = new Kinetic.Image
+            x: 125
+            y: 550
+            image: helpImageObj
+            width: 75
+            height: 75
+
+        @helpText = new Kinetic.Text
+            x: 134
+            y: 650
+            text: 'Help'
+            align: 'center'
+            fontSize: 25
+            fontFamily: cfg.fontFamily
+            fontStyle: cfg.fontStyle
+            fill: cfg.fontMenuColor
+
         aboutImageObj = new Image()
         @aboutImg = new Kinetic.Image
-            x: 125
+            x: 410
             y: 550
             image: aboutImageObj
             width: 75
             height: 75
 
         @aboutText = new Kinetic.Text
-            x: 128
+            x: 412
             y: 650
             text: 'About'
             align: 'center'
@@ -95,15 +113,15 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
         resumeImageObj = new Image()
         @resumeImg = new Kinetic.Image
-            x: 410
-            y: 550
+            x: 265
+            y: 740
             image: resumeImageObj
             width: 75
             height: 75
 
         @resumeText = new Kinetic.Text
-            x: 402
-            y: 650
+            x: 258
+            y: 820
             text: 'Resume'
             align: 'center'
             fontSize: 25
@@ -114,6 +132,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
         resetGameImageObj.src = 'img/menu-new-game-icon.png'
         scoreBoardImageObj.src = 'img/menu-high-score-icon.png'
+        helpImageObj.src = 'img/menu-help-icon.png'
         aboutImageObj.src = 'img/menu-about-icon.png'
         resumeImageObj.src = 'img/menu-resume-icon.png'
 
@@ -129,13 +148,21 @@ class Grot.MenuWidget extends GrotEngine.Widget
         @scoreBoardLinkText.on 'mousedown touchstart', (event) =>
             window.location.replace(cfg.scoreBoardLink)
 
-        @aboutImg.on 'mousedown touchstart', (event) =>
+        @helpImage.on 'mousedown touchstart', (event) =>
             @fire 'menuRemove'
             @menuLayer.fire 'showHelp'
 
-        @aboutText.on 'mousedown touchstart', (event) =>
+        @helpText.on 'mousedown touchstart', (event) =>
             @fire 'menuRemove'
             @menuLayer.fire 'showHelp'
+
+        @aboutImg.on 'mousedown touchstart', (event) =>
+            @fire 'menuRemove'
+            @menuLayer.fire 'showAbout'
+
+        @aboutText.on 'mousedown touchstart', (event) =>
+            @fire 'menuRemove'
+            @menuLayer.fire 'showAbout'
 
         @resumeImg.on 'mousedown touchstart', @close
 
@@ -147,7 +174,6 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
     updateHandler: ->
         if @menuLayer.parent
-            @background.width(@menuLayer.canvas.width / window.devicePixelRatio / @menuLayer.currentScale)
             @container.fire 'update'
 
     draw: () =>
@@ -159,6 +185,8 @@ class Grot.MenuWidget extends GrotEngine.Widget
         @container.add @resetGameText
         @container.add @scoreBoardLinkImg
         @container.add @scoreBoardLinkText
+        @container.add @helpImage
+        @container.add @helpText
         @container.add @aboutImg
         @container.add @aboutText
         @container.add @resumeImg
@@ -179,17 +207,17 @@ class Grot.GameOverWidget extends GrotEngine.Widget
         super
 
         @background = new Kinetic.Rect
-            width: 1600
+            width: 600
             height: 900
             x: 0
             y: 0
-            fill: cfg.gameOverMessageColor
+            fill: cfg.overlayColor
             opacity: 0.9
 
         @container = new GrotEngine.Widget
             width: 600
             height: 900
-            margins: {x: '50%', y: 0}
+            margins: {x: 0, y: 0}
             layer: @menuLayer
 
         @line = new Kinetic.Rect
@@ -290,7 +318,6 @@ class Grot.GameOverWidget extends GrotEngine.Widget
 
     updateHandler: ->
         if @menuLayer.parent
-            @background.width(@menuLayer.canvas.width / window.devicePixelRatio / @menuLayer.currentScale)
             @container.fire 'update'
 
     draw: (score) =>
@@ -313,7 +340,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
         @menuLayer.fire 'closeMenuOverlay'
 
 class Grot.HelpWidget extends GrotEngine.Widget
-    # Game over widget
+    # help widget
 
     game: null
     menuLayer: null
@@ -322,17 +349,17 @@ class Grot.HelpWidget extends GrotEngine.Widget
         super
 
         @background = new Kinetic.Rect
-            width: 1600
+            width: 600
             height: 900
             x: 0
             y: 0
-            fill: cfg.gameOverMessageColor
+            fill: cfg.overlayColor
             opacity: 0.9
 
         @container = new GrotEngine.Widget
             width: 600
             height: 900
-            margins: {x: '50%', y: 0}
+            margins: {x: 0, y: 0}
             layer: @menuLayer
 
         @appName = new Kinetic.Text
@@ -435,7 +462,6 @@ class Grot.HelpWidget extends GrotEngine.Widget
 
     updateHandler: ->
         if @menuLayer.parent
-            @background.width(@menuLayer.canvas.width / window.devicePixelRatio / @menuLayer.currentScale)
             @container.fire 'update'
 
     draw: () =>
@@ -462,8 +488,111 @@ class Grot.HelpWidget extends GrotEngine.Widget
         @removeChildren()
         @menuLayer.fire 'closeMenuOverlay'
 
+
+class Grot.AboutWidget extends GrotEngine.Widget
+    # about widget
+
+    game: null
+    menuLayer: null
+
+    constructor: (config) ->
+        super
+
+        @background = new Kinetic.Rect
+            width: 600
+            height: 900
+            x: 0
+            y: 0
+            fill: cfg.overlayColor
+            opacity: 0.9
+
+        @container = new GrotEngine.Widget
+            width: 600
+            height: 900
+            margins: {x: 0, y: 0}
+            layer: @menuLayer
+
+        @appName = new Kinetic.Text
+            x: 10
+            y: 50
+            fontSize: 60
+            fontFamily: cfg.fontFamily
+            text: 'GROT'
+            fill: cfg.fontMenuColor
+
+        @appVer = @appName.clone
+            y: 110
+            x: 10
+            fontSize: 36
+            text: cfg.aboutVer
+
+        @description = @appName.clone
+            y: 180
+            x: 10
+            width: 580
+            fontSize: 26
+            text: cfg.aboutDesc
+
+        logoImageObj = new Image()
+        @logoImg = new Kinetic.Image
+            x: 15
+            y: 245
+            image: logoImageObj
+            width: 182
+            height: 182
+
+        resumeImageObj = new Image()
+        @resumeImg = new Kinetic.Image
+            x: 265
+            y: 740
+            image: resumeImageObj
+            width: 75
+            height: 75
+
+        @resumeText = new Kinetic.Text
+            x: 258
+            y: 820
+            text: 'Resume'
+            align: 'center'
+            fontSize: 25
+            fontFamily: cfg.fontFamily
+            fontStyle: cfg.fontStyle
+            fill: cfg.fontMenuColor
+
+        logoImageObj.src = 'img/stxnext-logo.png'
+        resumeImageObj.src = 'img/menu-resume-icon.png'
+
+        @logoImg.on 'mousedown touchstart', (event) =>
+            window.location.replace(cfg.stxnextLink)
+        @resumeImg.on 'mousedown touchstart', @close
+        @resumeText.on 'mousedown touchstart', @close
+
+        @on 'aboutDraw', @draw
+        @on 'aboutRemove', @close
+        @fire 'update'
+
+    updateHandler: ->
+        if @menuLayer.parent
+            @container.fire 'update'
+
+    draw: () =>
+        @add @background
+        @add @container
+        @container.add @appName
+        @container.add @appVer
+        @container.add @description
+        @container.add @logoImg
+        @container.add @resumeImg
+        @container.add @resumeText
+        @getLayer().draw()
+
+    close: () =>
+        @removeChildren()
+        @menuLayer.fire 'closeMenuOverlay'
+
+
 class Grot.MenuOverlay extends GrotEngine.Layer
-    # Menu, GameOver, Help widgets
+    # Menu, GameOver, Help, About widgets
 
     renderManager: null
 
@@ -479,37 +608,49 @@ class Grot.MenuOverlay extends GrotEngine.Layer
         @helpWidget = new Grot.HelpWidget
             menuLayer: @
 
+        @aboutWidget = new Grot.AboutWidget
+            menuLayer: @
+
         @on 'showGameOver', @gameOverWidgetDraw
         @on 'showMenu', @menuWidgetDraw
         @on 'showHelp', @helpWidgetDraw
+        @on 'showAbout', @aboutWidgetDraw
         @on 'closeMenuOverlay', @closeMenuOverlay
-        @on 'onOverLayOpen', @onOverLayOpen
+        @on 'onOverlayOpen', @onOverlayOpen
 
     closeMenuOverlay: ->
         @renderManager.stage.fire 'normalizeBoardStuff'
+        document.body.style.backgroundColor = cfg.bodyColor
         @removeChildren
         @draw()
 
-    onOverLayOpen: ->
+    onOverlayOpen: ->
         @renderManager.stage.fire 'blurBoardStuff'
+        document.body.style.backgroundColor = cfg.overlayBodyColor
 
     updateHandler: ->
         super
         @gameOverWidget.fire 'update'
         @menuWidget.fire 'update'
         @helpWidget.fire 'update'
+        @aboutWidget.fire 'update'
 
     gameOverWidgetDraw: (score) ->
-        @fire 'onOverLayOpen'
+        @fire 'onOverlayOpen'
         @add @gameOverWidget
         @gameOverWidget.fire 'gameOverDraw', score
 
     menuWidgetDraw: () ->
-        @fire 'onOverLayOpen'
+        @fire 'onOverlayOpen'
         @add @menuWidget
         @menuWidget.fire 'menuDraw'
 
     helpWidgetDraw: () ->
-        @fire 'onOverLayOpen'
+        @fire 'onOverlayOpen'
         @add @helpWidget
         @helpWidget.fire 'helpDraw'
+
+    aboutWidgetDraw: () ->
+        @fire 'onOverlayOpen'
+        @add @aboutWidget
+        @aboutWidget.fire 'aboutDraw'

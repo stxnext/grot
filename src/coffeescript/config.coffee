@@ -51,7 +51,8 @@ window.cfg =
   Background color settings
   ###
   bodyColor: '#ffffff'
-  gameOverMessageColor: '#333333'
+  overlayColor: '#333333'
+  overlayBodyColor: '#484848'
 
   ###
   Urls settings
@@ -70,3 +71,21 @@ window.cfg =
             Clear all fields in a row or in a column\n
             to get extra points.\n\n
             Collect as many points as possible!'
+
+  ###
+  About description
+  ###
+  aboutDesc: ' Created by STX Next\n
+              http://stxnext.com\n
+              \n\n\n\n\n\n\n\n
+              Source code\n
+              https://github.com/stxnext/grot\n
+              \n
+              Credits\n
+              Wojciech Lichota\n
+              Michal Janiszewski\n
+              Damian Polcyn'
+
+
+  aboutVer: ' v1.1'
+  stxnextLink: 'http://stxnext.com/'
