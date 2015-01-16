@@ -72,6 +72,7 @@ class Grot.Field
     board: null
     renderManager: null
     relativeScale: null
+    preview: null
 
     points:
         gray: 1
@@ -83,22 +84,17 @@ class Grot.Field
         @id = "#{@x}-#{@y}"
         @renderManager = @board.renderManager
         @relativeScale = @board.fieldRelativeScale
+        @preview = @board.preview
         @relativeRadius = 2 * cfg.circleRadius * @relativeScale
         @resetRandoms()
         @widget = new Grot.FieldWidget
             field: @
 
     resetRandoms: () ->
-        # choose random value and random direction
-        # most common is gray field, most rare is red one.
-        points = [
-            'gray', 'gray', 'gray', 'gray',
-            'blue', 'blue', 'blue',
-            'green', 'green',
-            'red'
-        ]
-        @value = randomChoice(points)
-        @direction = randomChoice(['left', 'right', 'up', 'down'])
+        nextItem = @preview.pop()
+        @value = nextItem['value']
+        @direction = nextItem['direction']
+
         if @widget?
             @widget.reset()
 
@@ -117,11 +113,41 @@ class Grot.Field
         @id = "#{@x}-#{@y}"
 
 
+class Grot.Preview
+    # queue with next fields
+
+    data: []
+
+    constructor: (size) ->
+        for x in [0..size*size]
+            @data.push(@randomItem())
+
+    randomItem: ->
+        # choose random value and random direction
+        # most common is gray field, most rare is red one.
+        points = [
+            'gray', 'gray', 'gray', 'gray',
+            'blue', 'blue', 'blue',
+            'green', 'green',
+            'red'
+        ]
+        result =
+            value: randomChoice(points),
+            direction: randomChoice(['left', 'right', 'up', 'down'])
+        return result
+
+    pop: ->
+        result = @data.shift()
+        @data.push @randomItem()
+        return result
+
+
 class Grot.Board extends GrotEngine.Layer
     # Grid of fields.
 
     size: 9
     fields: []
+    preview: null
     fieldRelativeScale: 0
     renderManager: null
 
@@ -135,7 +161,8 @@ class Grot.Board extends GrotEngine.Layer
         @add @background
 
         @fieldRelativeScale = 5 / @size
-        @createBoard @size
+        @createPreview()
+        @createBoard()
 
     createBoard: () ->
         # create size x size board, calculate initial value of fields
@@ -143,6 +170,10 @@ class Grot.Board extends GrotEngine.Layer
             @fields.push (
                 new Grot.Field @, x, y for y in [0..@size-1]
             )
+
+    createPreview: () ->
+        @preview = new Grot.Preview @size
+        @preview.pop()
 
     getNextField: (field, lastDirection=null) ->
         # returns next field in chain reaction and information is it last step in this chain reaction
