@@ -188,9 +188,7 @@ class Engine
                 maxWidth = 0
                 layers = @stage.getLayers()
                 for layer in layers
-                    console.log layer.canvas.width
-                    console.log window.getPixelRatio
-                    maxWidth = Math.max(maxWidth, layer.canvas.width / window.getPixelRatio)
+                    maxWidth = Math.max(maxWidth, layer.canvas.width / layer.canvas.getPixelRatio())
 
                 marginWidth = Math.ceil((@getWindowSize()[0] - maxWidth)/2)
                 marginWidth = Math.max(marginWidth, 0)
