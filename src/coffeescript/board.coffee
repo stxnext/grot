@@ -106,10 +106,14 @@ class Grot.Field
         # calculate positions of a field widget
         relativeRadius = cfg.circleRadius * @relativeScale
         fieldSpacing = cfg.spaceBetweenFields * @relativeScale
-        return [
-            fieldSpacing + relativeRadius + @x * (relativeRadius * 2 + fieldSpacing),
-            fieldSpacing + relativeRadius + @y * (relativeRadius * 2 + fieldSpacing)
-        ]
+
+        centerX = fieldSpacing + relativeRadius + @x * (relativeRadius * 2 + fieldSpacing)
+        centerY = fieldSpacing + relativeRadius + @y * (relativeRadius * 2 + fieldSpacing)
+
+        if @board.showPreview
+            centerY += cfg.previewHeight * @relativeScale
+
+        return [centerX, centerY]
 
     updatePosition: (@x, @y) ->
         # update field position

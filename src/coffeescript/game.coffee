@@ -152,8 +152,6 @@ class RenderManager extends GrotEngine.RenderManager
             for y in [0..@board.size-1]
                 field = @board.fields[x][y]
                 [centerX, centerY] = field.getFieldCenter()
-                if @showPreview
-                    centerY += cfg.previewHeight * field.relativeScale
                 widget = field.widget
                 widget.relativeMove centerX, centerY
                 if not widget.callback?
