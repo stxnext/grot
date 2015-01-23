@@ -33,7 +33,7 @@ class RenderManager extends GrotEngine.RenderManager
     topBarWidget: null
     menuOverlay: null
 
-    constructor: (@boardSize, @game) ->
+    constructor: (@boardSize, @showPreview, @game) ->
         [width, height] = @getWindowSize()
         @currentScale = @calculateScaleUnit()
 
@@ -66,18 +66,20 @@ class RenderManager extends GrotEngine.RenderManager
             layer.fire('update')
 
     addLayers: ->
+        previewHeight = if @showPreview then cfg.previewHeight else 0
         @barsLayer = new GrotEngine.Layer
             width: 600
-            height: 900
+            height: 900+previewHeight
             margins: {x: 0, y: 0}
             renderManager: @
 
         @board = new Grot.Board
             size: @boardSize
+            showPreview: @showPreview
             renderManager: @
             margins: {x: 0, y: 180}
             width: 600
-            height: 600
+            height: 600+previewHeight
 
         @game.board = @board
 
@@ -86,26 +88,33 @@ class RenderManager extends GrotEngine.RenderManager
             hitGraphEnabled: false
             margins: {x: 0, y: 180}
             width: 600
-            height: 600
+            height: 600+previewHeight
             renderManager: @
 
         #create overlay for menu/gameover/help view
         @menuOverlay = new Grot.MenuOverlay
             width: 600
-            height: 900
+            height: 900+previewHeight
             margins: {x: 0, y: 0}
             renderManager: @
 
     addWidgets: ->
         @topBarWidget = new Grot.TopBarWidget
             game: @game
+            showPreview: @showPreview
         @bottomBarWidget = new Grot.BottomBarWidget
             game: @game
+            showPreview: @showPreview
 
         # add board fields to the layer
         for x in [0..@board.size-1]
             for y in [0..@board.size-1]
                 @board.add @board.fields[x][y].widget
+
+        # add preview fields to the layer
+        if @showPreview
+            for x in [0..@board.size*2-1]
+                @board.add @board.preview.fields[x].widget
 
         # add bar widgets to a barsLayer
 
@@ -143,11 +152,20 @@ class RenderManager extends GrotEngine.RenderManager
             for y in [0..@board.size-1]
                 field = @board.fields[x][y]
                 [centerX, centerY] = field.getFieldCenter()
+                if @showPreview
+                    centerY += cfg.previewHeight * field.relativeScale
                 widget = field.widget
                 widget.relativeMove centerX, centerY
                 if not widget.callback?
                     # set 'onClick' callback
                     widget.setupCallback(@startMove)
+
+        if @showPreview
+            for x in [0..@board.size*2-1]
+                field = @board.preview.fields[x]
+                [centerX, centerY] = field.getFieldCenter()
+                widget = field.widget
+                widget.relativeMove centerX, centerY
 
         return
 
@@ -261,7 +279,7 @@ class RenderManager extends GrotEngine.RenderManager
             for y in [0..@board.size-1]
                 field = @board.fields[x][y]
                 if field.direction == 'none'
-                    field.resetRandoms()
+                    field.reset()
 
                     # move field to animLayer until animation is finished
                     @moveFieldToLayer(field, @animLayer)
@@ -326,12 +344,17 @@ class Game extends GrotEngine.Game
     constructor: () ->
         super
 
-        qsSize = parseInt((new QueryString).get('size'))
+        qs = new QueryString
+        qsSize = parseInt(qs.get('size'))
+        qsPreview = qs.get('preview') is 'true'
 
         boardSize = if cfg.customBoardSize and qsSize
         then qsSize else cfg.defaultBoardSize
 
-        @renderManager = new RenderManager boardSize, @
+        showPreview = if cfg.customShowPreview and qsPreview
+        then qsPreview else cfg.showPreview
+
+        @renderManager = new RenderManager boardSize, showPreview, @
 
 
 document.body.style.cssText = 'background-color: ' + cfg.bodyColor + '; margin: 0; padding: 0;'

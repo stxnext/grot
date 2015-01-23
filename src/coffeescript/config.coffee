@@ -16,6 +16,17 @@ window.cfg =
   customBoardSize: true
 
   ###
+  Display row with fields that will replace empty fields after move
+  ###
+  showPreview: false
+
+  ###
+  Enables or disables possibility to pass
+  ?preview=yes param to enable preview
+  ###
+  customShowPreview: true
+
+  ###
   FieldWidget(Circle) settings
   ###
   circleColor1: '#868788'
@@ -23,8 +34,12 @@ window.cfg =
   circleColor3: '#8d198f'
   circleColor4: '#00968f'
 
-  circleRadius: 46
-  spaceBetweenFields: 12
+  circleRadius: 65
+  spaceBetweenFields: 16
+
+  previewHeight: 80
+  previewCircleRadius: 32
+  spaceBetweenPreviewFields: 8
 
   ###
   Arrow settings

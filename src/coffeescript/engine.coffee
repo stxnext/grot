@@ -137,6 +137,7 @@ class Engine
             baseWindowSize: if cfg.baseWindowSize? then cfg.baseWindowSize else null
             currentScale: null
             stage: null
+            showPreview: false
 
             constructor: ->
                 if not @baseWindowSize?
@@ -159,15 +160,27 @@ class Engine
                 return [window.innerWidth, window.innerHeight]
 
             calculateScaleUnit: ->
-                [width, height] = @getWindowSize()
+                [maxWidth, maxHeight] = @getWindowSize()
+                previewHeight = if @showPreview then cfg.previewHeight else 0
 
-                gameAspectRatio = 600 / 900
-                windowAspectRatio = width / height
+                width = 600
+                height = 900 + previewHeight
 
-                if (windowAspectRatio > gameAspectRatio)
-                    scale = (height / gameAspectRatio) / @baseWindowSize.width * 1.2
-                else
-                    scale = (width / gameAspectRatio) / @baseWindowSize.height
+                #check if current height is larger than max
+                if (height > maxHeight)
+                    ratio = maxHeight / height
+                    height = maxHeight
+                    width = width * ratio
+
+                #check if the current width is larger than the max
+                if (width > maxWidth)
+                    ratio = maxWidth / width
+                    width = maxWidth
+                    height = height * ratio
+
+                scaleXValue = width / 600
+                scaleYValue = height / (900 + previewHeight)
+                scale = Math.min(scaleXValue, scaleYValue)
 
                 return Number(scale.toFixed(2))
 
@@ -175,7 +188,9 @@ class Engine
                 maxWidth = 0
                 layers = @stage.getLayers()
                 for layer in layers
-                    maxWidth = Math.max(maxWidth, layer.canvas.width / layer.canvas.getPixelRatio())
+                    console.log layer.canvas.width
+                    console.log window.getPixelRatio
+                    maxWidth = Math.max(maxWidth, layer.canvas.width / window.getPixelRatio)
 
                 marginWidth = Math.ceil((@getWindowSize()[0] - maxWidth)/2)
                 marginWidth = Math.max(marginWidth, 0)

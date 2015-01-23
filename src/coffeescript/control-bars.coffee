@@ -8,13 +8,14 @@ class Grot.TopBarWidget extends GrotEngine.Widget
     score: null
     movesLabel: null
     moves: null
+    showPreview: false
 
     constructor: (config) ->
         super
 
         @background = new Kinetic.Rect
             width: 600
-            height: 210
+            height: 180
             fill: cfg.bodyColor
         @add @background
 
@@ -78,7 +79,7 @@ class Grot.TopBarWidget extends GrotEngine.Widget
 
         line = new Kinetic.Rect
             x: 0
-            y: 200
+            y: 180
             width: 600
             height: 2
             fill: cfg.fontScoMovNumColor
@@ -143,22 +144,24 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
     game: null
     help: null
     menu: null
+    showPreview: false
 
     constructor: (config) ->
         super
 
+        previewHeight = if @showPreview then cfg.previewHeight else 0
         @background = new Kinetic.Rect
             width: 600
-            height: 220
+            height: 120
             x: 0
-            y: 760
+            y: 780+previewHeight
             fill: cfg.bodyColor
         @add @background
 
         # group for help button
         @buttonHelpGroup = new Kinetic.Group
-            x: 525
-            y: 800
+            x: 524
+            y: 820+previewHeight
 
         @circleHelp = new Kinetic.Circle
             x: 20
@@ -190,7 +193,7 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
         heroImgObj.onload = () =>
             @hero = new Kinetic.Image
                 x: 210
-                y: 746
+                y: 746+previewHeight
                 image: heroImgObj
                 width: 180
                 height: 150
@@ -202,8 +205,8 @@ class Grot.BottomBarWidget extends GrotEngine.Widget
 
         # group for menu button
         @buttonMenuGroup = new Kinetic.Group
-            x: 45
-            y: 800
+            x: 36
+            y: 820+previewHeight
 
         @circleMenu = new Kinetic.Circle
             x: 20
