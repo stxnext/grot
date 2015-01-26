@@ -127,11 +127,11 @@ class Grot.PreviewField extends Grot.Field
         @id = "preview-#{@x}"
         @renderManager = @board.renderManager
         @relativeScale = @board.fieldRelativeScale
-        @reset()
+        @randomParams()
         @widget = new Grot.FieldWidget
             field: @
 
-    reset: ->
+    randomParams: ->
         # choose random value and random direction
         # most common is gray field, most rare is red one.
         points = [
@@ -142,9 +142,6 @@ class Grot.PreviewField extends Grot.Field
         ]
         @value = randomChoice(points)
         @direction = randomChoice(['left', 'right', 'up', 'down'])
-
-        if @widget?
-            @widget.reset()
 
     getFieldCenter: () ->
         # calculate positions of a field widget
@@ -176,13 +173,15 @@ class Grot.Preview
     pop: ->
         field = @fields.shift()
         result = [field.value, field.direction]
-
-        field.updatePosition @size * 2 - 1
-        field.reset()
+        field.widget.destroy()
 
         for i in @fields
             i.shift()
-        @fields.push field
+
+        newField = new Grot.PreviewField @board, @size*2-1
+        newField.widget.setOpacity 0 # will be shown by addWidgets later
+        @fields.push newField
+        @board.add newField.widget
 
         return result
 

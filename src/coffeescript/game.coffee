@@ -114,6 +114,7 @@ class RenderManager extends GrotEngine.RenderManager
         # add preview fields to the layer
         if @showPreview
             for x in [0..@board.size*2-1]
+                @board.preview.fields[x].widget.setOpacity 1
                 @board.add @board.preview.fields[x].widget
 
         # add bar widgets to a barsLayer
@@ -164,8 +165,6 @@ class RenderManager extends GrotEngine.RenderManager
                 [centerX, centerY] = field.getFieldCenter()
                 widget = field.widget
                 widget.relativeMove centerX, centerY
-
-        return
 
     listening: (state) ->
         # toggle listening for event on all field widgets
@@ -262,13 +261,19 @@ class RenderManager extends GrotEngine.RenderManager
 
         if tweens.length > 0
             tweens[0].onFinish = () =>
-                @fillEmptyFields()
+                if @showPreview
+                    @movePreviewToEmptyFields()
+                else
+                    @fillEmptyFields()
                 `this.destroy()`
 
             for tween in tweens
                 tween.play()
         else
-            @fillEmptyFields()
+            if @showPreview
+                @movePreviewToEmptyFields()
+            else
+                @fillEmptyFields()
 
     fillEmptyFields: () ->
         # reset fields in empty places and show them
@@ -290,6 +295,93 @@ class RenderManager extends GrotEngine.RenderManager
                             `this.destroy()`
 
         @stage.fire 'onStageUpdated'
+
+        if tweens.length > 0
+            tweens[0].onFinish = () =>
+                @finishMove()
+                `this.destroy()`
+
+            for tween in tweens
+                tween.play()
+        else
+            @finishMove()
+
+    movePreviewToEmptyFields: () ->
+        # move preview field to empty places
+        tweens = []
+        previewIndex = 0
+        for x in [0..@board.size-1]
+            for y in [0..@board.size-1]
+                field = @board.fields[x][y]
+                if field.direction == 'none'
+                    [centerX, centerY] = field.getFieldCenter()
+
+                    previewField = @board.preview.fields[previewIndex]
+                    previewIndex += 1
+                    if previewField?
+                        # move field to animLayer until animation is finished
+                        @moveFieldToLayer(previewField, @animLayer)
+
+                        tweens.push new Kinetic.Tween
+                            node: previewField.widget
+                            x: centerX
+                            y: centerY
+                            scaleX: 2
+                            scaleY: 2
+                            duration: TWEEN_DURATION
+                            onFinish: =>
+                                `this.destroy()`
+
+        # shift rest of preview to the left
+        if previewIndex < @board.size*2-1
+            for x in [previewIndex..@board.size*2-1]
+                previewField = @board.preview.fields[x]
+                destinationField = @board.preview.fields[x-previewIndex]
+                [centerX, centerY] = destinationField.getFieldCenter()
+
+                @moveFieldToLayer(previewField, @animLayer)
+
+                tweens.push new Kinetic.Tween
+                    node: previewField.widget
+                    x: centerX
+                    y: centerY
+                    duration: TWEEN_DURATION
+                    onFinish: =>
+                        `this.destroy()`
+
+        if tweens.length > 0
+            tweens[0].onFinish = () =>
+                @updatePreview()
+                `this.destroy()`
+
+            for tween in tweens
+                tween.play()
+        else
+            @updatePreview()
+
+    updatePreview: () ->
+        # move values and direction from preview to field
+        tweens = []
+
+        for x in [0..@board.size-1]
+            for y in [0..@board.size-1]
+                field = @board.fields[x][y]
+                if field.direction == 'none'
+                    field.reset() # this will destroy preview widget
+                    field.widget.setOpacity 1
+
+        @stage.fire 'onStageUpdated'
+
+        # show new preview fields on the end of preview queue
+        for x in [0..@board.size*2-1]
+            previewField = @board.preview.fields[x]
+            if previewField.widget.getOpacity() == 0
+                tweens.push new Kinetic.Tween
+                    node: previewField.widget
+                    opacity: 1
+                    duration: TWEEN_DURATION
+                    onFinish: =>
+                        `this.destroy()`
 
         if tweens.length > 0
             tweens[0].onFinish = () =>
