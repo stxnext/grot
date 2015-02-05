@@ -97,6 +97,7 @@ class RenderManager extends GrotEngine.RenderManager
             height: 900+previewHeight
             margins: {x: 0, y: 0}
             renderManager: @
+            showPreview: @showPreview
 
     addWidgets: ->
         @topBarWidget = new Grot.TopBarWidget

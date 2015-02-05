@@ -3,14 +3,16 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
     group: null
     menuLayer: null
+    showPreview: false
     game: null
 
     constructor: (config) ->
         super
 
+        previewHeight = if @showPreview then cfg.previewHeight else 0
         @background = new Kinetic.Rect
             width: 600
-            height: 900
+            height: 900+previewHeight
             x: 0
             y: 0
             fill: cfg.overlayColor
@@ -18,7 +20,7 @@ class Grot.MenuWidget extends GrotEngine.Widget
 
         @container = new GrotEngine.Widget
             width: 600
-            height: 900
+            height: 900+previewHeight
             margins: {x: 0, y: 0}
             layer: @menuLayer
 
@@ -129,7 +131,6 @@ class Grot.MenuWidget extends GrotEngine.Widget
             fontStyle: cfg.fontStyle
             fill: cfg.fontMenuColor
 
-
         resetGameImageObj.src = 'img/menu-new-game-icon.png'
         scoreBoardImageObj.src = 'img/menu-high-score-icon.png'
         helpImageObj.src = 'img/menu-help-icon.png'
@@ -197,18 +198,21 @@ class Grot.MenuWidget extends GrotEngine.Widget
         @removeChildren()
         @menuLayer.fire 'closeMenuOverlay'
 
+
 class Grot.GameOverWidget extends GrotEngine.Widget
     # Game over widget
 
     game: null
     menuLayer: null
+    showPreview: null
 
     constructor: (config) ->
         super
 
+        previewHeight = if @showPreview then cfg.previewHeight else 0
         @background = new Kinetic.Rect
             width: 600
-            height: 900
+            height: 900+previewHeight
             x: 0
             y: 0
             fill: cfg.overlayColor
@@ -216,7 +220,7 @@ class Grot.GameOverWidget extends GrotEngine.Widget
 
         @container = new GrotEngine.Widget
             width: 600
-            height: 900
+            height: 900+previewHeight
             margins: {x: 0, y: 0}
             layer: @menuLayer
 
@@ -339,18 +343,22 @@ class Grot.GameOverWidget extends GrotEngine.Widget
         @removeChildren()
         @menuLayer.fire 'closeMenuOverlay'
 
+
 class Grot.HelpWidget extends GrotEngine.Widget
     # help widget
 
     game: null
     menuLayer: null
+    showPreview: false
 
     constructor: (config) ->
         super
 
+        previewHeight = if @showPreview then cfg.previewHeight else 0
+        console.log previewHeight
         @background = new Kinetic.Rect
             width: 600
-            height: 900
+            height: 900+previewHeight
             x: 0
             y: 0
             fill: cfg.overlayColor
@@ -358,7 +366,7 @@ class Grot.HelpWidget extends GrotEngine.Widget
 
         @container = new GrotEngine.Widget
             width: 600
-            height: 900
+            height: 900+previewHeight
             margins: {x: 0, y: 0}
             layer: @menuLayer
 
@@ -494,13 +502,15 @@ class Grot.AboutWidget extends GrotEngine.Widget
 
     game: null
     menuLayer: null
+    showPreview: false
 
     constructor: (config) ->
         super
 
+        previewHeight = if @showPreview then cfg.previewHeight else 0
         @background = new Kinetic.Rect
             width: 600
-            height: 900
+            height: 900+previewHeight
             x: 0
             y: 0
             fill: cfg.overlayColor
@@ -508,7 +518,7 @@ class Grot.AboutWidget extends GrotEngine.Widget
 
         @container = new GrotEngine.Widget
             width: 600
-            height: 900
+            height: 900+previewHeight
             margins: {x: 0, y: 0}
             layer: @menuLayer
 
@@ -594,6 +604,7 @@ class Grot.AboutWidget extends GrotEngine.Widget
 class Grot.MenuOverlay extends GrotEngine.Layer
     # Menu, GameOver, Help, About widgets
 
+    showPreview: false
     renderManager: null
 
     constructor: ->
@@ -601,15 +612,19 @@ class Grot.MenuOverlay extends GrotEngine.Layer
 
         @gameOverWidget = new Grot.GameOverWidget
             menuLayer: @
+            showPreview: @showPreview
 
         @menuWidget = new Grot.MenuWidget
             menuLayer: @
+            showPreview: @showPreview
 
         @helpWidget = new Grot.HelpWidget
             menuLayer: @
+            showPreview: @showPreview
 
         @aboutWidget = new Grot.AboutWidget
             menuLayer: @
+            showPreview: @showPreview
 
         @on 'showGameOver', @gameOverWidgetDraw
         @on 'showMenu', @menuWidgetDraw
