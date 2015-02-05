@@ -12,7 +12,6 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         watch: {
             options: {
-                livereload: '<%= connect.options.livereload %>',
                 spawn: false
             },
             coffee: {
@@ -22,7 +21,8 @@ module.exports = function (grunt) {
             statics: {
                 files: [
                     '<%= app.src %>/html/{,*/}*.html',
-                    '<%= app.src %>/javascript/{,*/}*.js'
+                    '<%= app.src %>/javascript/{,*/}*.js',
+                    '<%= app.src %>/css/{,*/}*.css'
                 ],
                 tasks: ['copy:dev']
             }
@@ -31,7 +31,7 @@ module.exports = function (grunt) {
             options: {
                 port: 8080,
                 open: true,
-                livereload: 35729,
+                //livereload: 35729,
                 hostname: '0.0.0.0'
             },
             livereload: {
@@ -81,6 +81,7 @@ module.exports = function (grunt) {
                 assetsDirs: ['<%= app.build %>']
             }
         },
+        concat: {},
         copy: {
             dev: {
                 files: [{
@@ -96,6 +97,14 @@ module.exports = function (grunt) {
                     dot: true,
                     cwd: '<%= app.src %>/fonts',
                     dest: '<%= app.tmp %>/fonts/',
+                    src: [
+                        '*',
+                    ]
+                },{
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= app.src %>/css',
+                    dest: '<%= app.tmp %>/css/',
                     src: [
                         '*',
                     ]
