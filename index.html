@@ -197,10 +197,13 @@
                 var n = Math.max(20, maxMargin - Math.ceil(document.body.scrollTop / 2));
                 var opacity = Math.min(1, 20 / (n / 4));
                 var scale = Math.max(100, Math.min(200, n));
+                var arrowBg = '';
+                if(document.body.scrollTop == 0)
+                    arrowBg = " url('../img/down.png') no-repeat center bottom";
                 document.getElementById('header').style.cssText =
                     'padding-top: ' + n + 'px; \
                     padding-bottom: ' + n + 'px; \
-                    background-color: rgba(0, 150, 143, ' + opacity + ');';
+                    background: rgba(0, 150, 143, ' + opacity + ')' + arrowBg + ';';
                 document.getElementById('by_stxnext').style.cssText =
                     'width: ' + scale + 'px;';
             }
