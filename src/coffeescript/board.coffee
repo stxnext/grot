@@ -8,8 +8,6 @@ class Grot.FieldWidget extends GrotEngine.Widget
     callback: null
     relativeScale: null
 
-    # based on: http://flatuicolors.com/
-
     colors:
         gray: cfg.circleColor1
         blue: cfg.circleColor2
@@ -25,16 +23,21 @@ class Grot.FieldWidget extends GrotEngine.Widget
 
     constructor: (config) ->
         super
+        if @field instanceof Grot.PreviewField
+            radius = cfg.previewCircleRadius
+            @arrow = smallArrow.clone()
+        else
+            radius = cfg.circleRadius
+            @arrow = arrow.clone()
 
         @relativeScale = @field.relativeScale
         @circle = new Kinetic.Circle
             x: 0
             y: 0
-            radius: cfg.circleRadius
+            radius: radius
             fill: @colors[@field.value]
             transformsEnabled: 'position'
 
-        @arrow = arrow.clone()
         @arrow.rotate(@arrows[@field.direction])
 
         @add @circle
@@ -72,6 +75,7 @@ class Grot.Field
     board: null
     renderManager: null
     relativeScale: null
+    preview: null
 
     points:
         gray: 1
@@ -83,12 +87,51 @@ class Grot.Field
         @id = "#{@x}-#{@y}"
         @renderManager = @board.renderManager
         @relativeScale = @board.fieldRelativeScale
-        @relativeRadius = 2 * cfg.circleRadius * @relativeScale
-        @resetRandoms()
+        @preview = @board.preview
+        @reset()
         @widget = new Grot.FieldWidget
             field: @
 
-    resetRandoms: () ->
+    reset: () ->
+        [@value, @direction] = @preview.pop()
+
+        if @widget?
+            @widget.reset()
+
+    getPoints: () ->
+        # get points of field
+        return @points[@value]
+
+    getFieldCenter: ()->
+        # calculate positions of a field widget
+        relativeRadius = cfg.circleRadius * @relativeScale
+        fieldSpacing = cfg.spaceBetweenFields * @relativeScale
+
+        centerX = fieldSpacing + relativeRadius + @x * (relativeRadius * 2 + fieldSpacing)
+        centerY = fieldSpacing + relativeRadius + @y * (relativeRadius * 2 + fieldSpacing)
+
+        if @board.showPreview
+            centerY += cfg.previewHeight * @relativeScale
+
+        return [centerX, centerY]
+
+    updatePosition: (@x, @y) ->
+        # update field position
+        @id = "#{@x}-#{@y}"
+
+
+class Grot.PreviewField extends Grot.Field
+    # Field preview
+
+    constructor: (@board, @x) ->
+        @id = "preview-#{@x}"
+        @renderManager = @board.renderManager
+        @relativeScale = @board.fieldRelativeScale
+        @randomParams()
+        @widget = new Grot.FieldWidget
+            field: @
+
+    randomParams: ->
         # choose random value and random direction
         # most common is gray field, most rare is red one.
         points = [
@@ -99,22 +142,48 @@ class Grot.Field
         ]
         @value = randomChoice(points)
         @direction = randomChoice(['left', 'right', 'up', 'down'])
-        if @widget?
-            @widget.reset()
 
-    getPoints: () ->
-        # get points of field
-        return @points[@value]
-
-    getFieldCenter: ()->
+    getFieldCenter: () ->
         # calculate positions of a field widget
-        relativeRadius = 2 * cfg.circleRadius * @relativeScale
-        fieldSpacing = relativeRadius + cfg.spaceBetweenFields * @renderManager.currentScale
-        return [@x * fieldSpacing + relativeRadius,  (@y) * fieldSpacing + relativeRadius]
 
-    updatePosition: (@x, @y) ->
-        # update field position
-        @id = "#{@x}-#{@y}"
+        fieldRadius = cfg.circleRadius * @relativeScale
+        previewRadius = cfg.previewCircleRadius * @relativeScale
+        fieldSpacing = cfg.spaceBetweenFields * @relativeScale
+        previewSpacing = cfg.spaceBetweenPreviewFields * @relativeScale
+        return [
+            fieldSpacing + previewRadius + @x * (previewRadius * 2 + previewSpacing),
+            fieldSpacing + previewRadius
+        ]
+
+    updatePosition: (@x) ->
+        @id = "preview-#{@x}"
+
+    shift: () ->
+        @updatePosition(@x-1)
+
+
+class Grot.Preview
+    # queue with next fields
+
+    fields: []
+
+    constructor: (@board, @size) ->
+        @fields = (new Grot.PreviewField(@board, x) for x in [0..@size*2-1])
+
+    pop: ->
+        field = @fields.shift()
+        result = [field.value, field.direction]
+        field.widget.destroy()
+
+        for i in @fields
+            i.shift()
+
+        newField = new Grot.PreviewField @board, @size*2-1
+        newField.widget.setOpacity 0 # will be shown by addWidgets later
+        @fields.push newField
+        @board.add newField.widget
+
+        return result
 
 
 class Grot.Board extends GrotEngine.Layer
@@ -122,6 +191,8 @@ class Grot.Board extends GrotEngine.Layer
 
     size: 9
     fields: []
+    preview: null
+    showPreview: false
     fieldRelativeScale: 0
     renderManager: null
 
@@ -134,8 +205,9 @@ class Grot.Board extends GrotEngine.Layer
             fill: cfg.bodyColor
         @add @background
 
-        @fieldRelativeScale = 5 / @size
-        @createBoard @size
+        @fieldRelativeScale = 4 / @size
+        @createPreview()
+        @createBoard()
 
     createBoard: () ->
         # create size x size board, calculate initial value of fields
@@ -143,6 +215,10 @@ class Grot.Board extends GrotEngine.Layer
             @fields.push (
                 new Grot.Field @, x, y for y in [0..@size-1]
             )
+
+    createPreview: () ->
+        @preview = new Grot.Preview @, @size
+        @preview.pop()
 
     getNextField: (field, lastDirection=null) ->
         # returns next field in chain reaction and information is it last step in this chain reaction

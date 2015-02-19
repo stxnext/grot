@@ -1,46 +1,241 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>GROT</title>
-        <meta name="author" content="Wojciech Lichota" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-        <!-- build:js js/kinetic.js -->
-        <script type="text/javascript" src="js/kinetic-v5.0.2.min.js"></script>
-        <!-- endbuild -->
-        <style>
-            /* latin-ext */
-            @font-face {
-              font-family: 'Lato';
-              font-style: normal;
-              font-weight: 400;
-              src: local('Lato Regular'), local('Lato-Regular'), url(fonts/LatoRegular-latin-ext.woff) format('woff');
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>GROT</title>
+    <meta name="theme-color" content="#00968f">
+
+    <meta name="author" content="STX Next" />
+    <meta name="keywords" content="stxnext,grot,games,python,pycon,europython,kineticjs,javascript,coffeescript,ios,android,html5">
+    <meta name="robots" content="follow, all">
+    <meta name="language" content="en-GB">
+    <meta name="description" content="STX Next is the largest Python software house in Europe. Python and JavaScript is also our hobby so we create games in our favorite languages. Check our hackathons and GROT game!">
+
+    <!-- build:css css/main.css -->
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- endbuild -->
+</head>
+<body>
+    <div id="loading">
+        <img src="img/loading.gif"/>
+    </div>
+
+    <div id="main" style="display: none;">
+
+        <div id="header">
+            <div id="header_box">
+                <h1>GROT</h1>
+                <img id="by_stxnext" src="img/by_stxnext.png"/>
+            </div>
+        </div>
+        <div id="content" >
+
+            <div class="links">
+                <a href="levels.html"><img src="img/html5_badge.png"/></a>
+                <a href="https://itunes.apple.com/bb/app/grot-puzzle/id906596745"><img src="img/app_store_badge.png"/></a>
+                <a href="https://play.google.com/store/apps/details?id=pl.stxnext.grot"><img src="img/google_play_badge.png"/></a>
+            </div>
+            <div class="text">
+                <h2>About</h2>
+                <p>
+                    <b>GROT</b> (ang. arrowhead) is a logic game about making
+                    the most valuable chains possible!
+                </p>
+                <p>
+                    Tap or click any field to start a chain reaction - fields
+                    will move one by one in the direction shown by the arrowheads.
+                </p>
+                <p>
+                    Longer chains grant move bonuses.
+                    Clear all fields in a row or in a column to get extra points.
+                    Collect as many points as possible!
+                </p>
+            </div>
+
+            <div class="text">
+                <h2>Contests</h2>
+                <p>
+                    During <a href="https://ep2014.europython.eu/">EuroPython 2014</a>
+                    and <a href="pl.pycon.org/2014"> PyCon PL 2014</a> conferences,
+                    <a href="http://stxnext.com">STX Next</a> organized contests in
+                    which attendees had to to write an algorithm, which will play
+                    the game and have the highest final score.
+                </p>
+                <p>
+                    For more details, see
+                    <a href="http://games.stxnext.com">games.stxnext.com</a>
+                    website.
+                </p>
+            </div>
+            <div class="text">
+                <h2>PythonHasPower</h2>
+                <p>
+                    <b>GROT</b> game is also used during
+                    <a href="http://pythonhaspower.com/">PythonHasPower</a>
+                    training workshop. Participants at first learn Python and
+                    than practice it by writing an algorithm, which will play
+                    the game.
+                </p>
+                <p>
+                    For more details, see
+                    <a href="http://pythonhaspower.com/warsztaty.htm">pythonhaspower.com</a>
+                    website.
+                </p>
+            </div>
+            <div id="source">
+                <h2>Source code</h2>
+                <p>
+                    The source code is available on GitHub under a MIT license.
+                    <ul>
+                        <li>
+                            <a href="https://github.com/stxnext/grot">HTML5 game</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/stxnext/grot-ios">iOS game</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/stxnext/grot-andorid">Android game</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/stxnext/grot-server">Contest server</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/stxnext/grot-client">Contest client</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/stxnext/grot-board-game">Board game</a>
+                        </li>
+                    </ul>
+                </p>
+            </div>
+            <div id="credits">
+                <h2>Credits</h2>
+                <p>
+                    <b>GROT</b> was created by <a href="http://stxnext.com">STX Next</a> employees.
+                </p>
+                <ul>
+                    <li>
+                        <h3>Concept</h3>
+                        <ul>
+                            <li>Wojciech Lichota</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h3>Design</h3>
+                        <ul>
+                            <li>Michał Janiszewski</li>
+                            <li>Sylwia Dokładna</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h3>HTML5 game</h3>
+                        <ul>
+                            <li>Damian Polcyn</li>
+                            <li>Michał Janiszewski</li>
+                            <li>Wojciech Lichota</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h3>iOS game</h3>
+                        <ul>
+                            <li>Adam Pieskiewicz</li>
+                            <li>Dawid Żakowski</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h3>Android game</h3>
+                        <ul>
+                            <li>Mieszko Stelmach</li>
+                            <li>Tomasz Konieczny</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h3>Board game</h3>
+                        <ul>
+                            <li>Wojciech Lichota</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h3>Contest server &amp; client</h3>
+                        <ul>
+                            <li>Andrzej Bartosiński</li>
+                            <li>Krzysztof Kęsy</li>
+                            <li>Tomasz Lewandowski</li>
+                            <li>Tomasz Żyźniewski</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h3>PythonHasPower</h3>
+                        <ul>
+                            <li>Agata Juszczak</li>
+                            <li>Agata Landzwójczak</li>
+                            <li>Anna Kierczyńska</li>
+                            <li>Łukasz Jagodziński</li>
+                            <li>Michał Janiszewski</li>
+                            <li>Piotr Mazurek</li>
+                            <li>Sylwia Hamerska</li>
+                            <li>Tomasz Żyźniewski</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h3>Website &amp; marketing</h3>
+                        <ul>
+                            <li>Agata Maroń</li>
+                            <li>Alexander Lübeck</li>
+                            <li>Andrzej Bartosiński</li>
+                            <li>Anna Kierczyńska</li>
+                            <li>Michał Janiszewski</li>
+                            <li>Piotr Rorot</li>
+                            <li>Sylwia Dokładna</li>
+                            <li>Wojciech Lichota</li>
+                        </ul>
+                    </li>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            function resizeHeader() {
+                var maxMargin = Math.ceil((window.innerHeight - 140) / 2);
+                var n = Math.max(20, maxMargin - Math.ceil(document.body.scrollTop / 2));
+                var opacity = Math.min(1, 20 / (n / 4));
+                var scale = Math.max(100, Math.min(200, n));
+                var arrowBg = '';
+                if(document.body.scrollTop == 0)
+                    arrowBg = " url('../img/down.png') no-repeat center bottom";
+                document.getElementById('header').style.cssText =
+                    'padding-top: ' + n + 'px; \
+                    padding-bottom: ' + n + 'px; \
+                    background: rgba(0, 150, 143, ' + opacity + ')' + arrowBg + ';';
+                document.getElementById('by_stxnext').style.cssText =
+                    'width: ' + scale + 'px;';
             }
-            body {
-                overflow: hidden;
+            function resetHeader() {
+                resizeHeader();
+                document.getElementById('content').style.cssText =
+                    'padding-top: ' + (window.innerHeight + 10) + 'px;';
             }
 
-            #wrap {
-                text-align: center;
-                overflow: hidden;
-            }
+            window.scroll(0, 0);
+            window.addEventListener("scroll", resizeHeader);
+            window.addEventListener("resize", resetHeader);
+            window.addEventListener("orientationchange", resetHeader);
+            resetHeader();
 
-            canvas {
-                margin: auto;
-            }
-        </style>
-    </head>
-
-    <body>
-        <div id="wrap"></div>
-        <!-- build:js js/grot.js -->
-        <script type="text/javascript" src="js/config.js"></script>
-        <script type="text/javascript" src="js/engine.js"></script>
-        <script type="text/javascript" src="js/control-bars.js"></script>
-        <script type="text/javascript" src="js/arrow.js"></script>
-        <script type="text/javascript" src="js/board.js"></script>
-        <script type="text/javascript" src="js/menu.js"></script>
-        <script type="text/javascript" src="js/game.js"></script>
-        <!-- endbuild -->
-    </body>
+            document.getElementById('loading').style.cssText = 'display: none;';
+            document.getElementById('main').style.cssText = 'display: block;';
+        });
+    </script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-12316674-13', 'auto');
+        ga('send', 'pageview');
+    </script>
+</body>
 </html>

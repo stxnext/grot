@@ -12,7 +12,6 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         watch: {
             options: {
-                livereload: '<%= connect.options.livereload %>',
                 spawn: false
             },
             coffee: {
@@ -22,7 +21,8 @@ module.exports = function (grunt) {
             statics: {
                 files: [
                     '<%= app.src %>/html/{,*/}*.html',
-                    '<%= app.src %>/javascript/{,*/}*.js'
+                    '<%= app.src %>/javascript/{,*/}*.js',
+                    '<%= app.src %>/css/{,*/}*.css'
                 ],
                 tasks: ['copy:dev']
             }
@@ -31,7 +31,6 @@ module.exports = function (grunt) {
             options: {
                 port: 8080,
                 open: true,
-                livereload: 35729,
                 hostname: '0.0.0.0'
             },
             livereload: {
@@ -70,16 +69,24 @@ module.exports = function (grunt) {
             }
         },
         useminPrepare: {
-            html: '<%= app.tmp %>/index.html',
+            html: '<%= app.tmp %>/*.html',
             options: {
                 dest: '<%= app.build %>'
             }
         },
         usemin: {
-            html: ['<%= app.build %>/index.html'],
+            html: ['<%= app.build %>/*.html'],
             options: {
                 assetsDirs: ['<%= app.build %>']
             }
+        },
+        concat: {
+            style: {
+                src: [
+                    '<%= app.tmp %>/css/*.css'
+                ],
+                dest: '<%= app.build %>/css/main.css'
+            },
         },
         copy: {
             dev: {
@@ -102,6 +109,14 @@ module.exports = function (grunt) {
                 },{
                     expand: true,
                     dot: true,
+                    cwd: '<%= app.src %>/css',
+                    dest: '<%= app.tmp %>/css/',
+                    src: [
+                        '*',
+                    ]
+                },{
+                    expand: true,
+                    dot: true,
                     cwd: '<%= app.src %>/html',
                     src: '*.html',
                     dest: '<%= app.tmp %>'
@@ -115,7 +130,7 @@ module.exports = function (grunt) {
                     cwd: '<%= app.src %>',
                     dest: '<%= app.build %>/img',
                     src: [
-                        '{,*/}*.{png,jpg,jpeg}',
+                        '{,*/}*.{png,jpg,jpeg,gif}',
                     ]
                 },{
                     expand: true,

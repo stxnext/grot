@@ -216,25 +216,37 @@ var arrowCommands = [
     }
 ];
 
+function drawArrow(ctx, scale) {
+    var i, cmd;
+    var s = scale;
+    ctx.beginPath();
+    for (i = 0; i < arrowCommands.length; i += 1) {
+        cmd = arrowCommands[i];
+        if (cmd.type === 'M') {
+            ctx.moveTo(cmd.x*s, cmd.y*s);
+        } else if (cmd.type === 'L') {
+            ctx.lineTo(cmd.x*s, cmd.y*s);
+        } else if (cmd.type === 'C') {
+            ctx.bezierCurveTo(cmd.x1*s, cmd.y1*s, cmd.x2*s, cmd.y2*s, cmd.x*s, cmd.y*s);
+        } else if (cmd.type === 'Q') {
+            ctx.quadraticCurveTo(cmd.x1*s, cmd.y1*s, cmd.x*s, cmd.y*s);
+        } else if (cmd.type === 'Z') {
+            ctx.closePath();
+        }
+    }
+}
 
 var arrow = new Kinetic.Shape({
     sceneFunc: function(ctx) {
-        var i, cmd;
-        ctx.beginPath();
-        for (i = 0; i < arrowCommands.length; i += 1) {
-            cmd = arrowCommands[i];
-            if (cmd.type === 'M') {
-                ctx.moveTo(cmd.x, cmd.y);
-            } else if (cmd.type === 'L') {
-                ctx.lineTo(cmd.x, cmd.y);
-            } else if (cmd.type === 'C') {
-                ctx.bezierCurveTo(cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y);
-            } else if (cmd.type === 'Q') {
-                ctx.quadraticCurveTo(cmd.x1, cmd.y1, cmd.x, cmd.y);
-            } else if (cmd.type === 'Z') {
-                ctx.closePath();
-            }
-        }
+        drawArrow(ctx, 1.5);
+        ctx.fillStrokeShape(this);
+    },
+    fill: cfg.arrowColor
+});
+
+var smallArrow = new Kinetic.Shape({
+    sceneFunc: function(ctx) {
+        drawArrow(ctx, 0.75);
         ctx.fillStrokeShape(this);
     },
     fill: cfg.arrowColor

@@ -33,7 +33,7 @@ class RenderManager extends GrotEngine.RenderManager
     topBarWidget: null
     menuOverlay: null
 
-    constructor: (@boardSize, @game) ->
+    constructor: (@boardSize, @showPreview, @game) ->
         [width, height] = @getWindowSize()
         @currentScale = @calculateScaleUnit()
 
@@ -66,18 +66,20 @@ class RenderManager extends GrotEngine.RenderManager
             layer.fire('update')
 
     addLayers: ->
+        previewHeight = if @showPreview then cfg.previewHeight else 0
         @barsLayer = new GrotEngine.Layer
             width: 600
-            height: 900
+            height: 900+previewHeight
             margins: {x: 0, y: 0}
             renderManager: @
 
         @board = new Grot.Board
             size: @boardSize
+            showPreview: @showPreview
             renderManager: @
             margins: {x: 0, y: 180}
             width: 600
-            height: 600
+            height: 600+previewHeight
 
         @game.board = @board
 
@@ -86,26 +88,35 @@ class RenderManager extends GrotEngine.RenderManager
             hitGraphEnabled: false
             margins: {x: 0, y: 180}
             width: 600
-            height: 600
+            height: 600+previewHeight
             renderManager: @
 
         #create overlay for menu/gameover/help view
         @menuOverlay = new Grot.MenuOverlay
             width: 600
-            height: 900
+            height: 900+previewHeight
             margins: {x: 0, y: 0}
             renderManager: @
+            showPreview: @showPreview
 
     addWidgets: ->
         @topBarWidget = new Grot.TopBarWidget
             game: @game
+            showPreview: @showPreview
         @bottomBarWidget = new Grot.BottomBarWidget
             game: @game
+            showPreview: @showPreview
 
         # add board fields to the layer
         for x in [0..@board.size-1]
             for y in [0..@board.size-1]
                 @board.add @board.fields[x][y].widget
+
+        # add preview fields to the layer
+        if @showPreview
+            for x in [0..@board.size*2-1]
+                @board.preview.fields[x].widget.setOpacity 1
+                @board.add @board.preview.fields[x].widget
 
         # add bar widgets to a barsLayer
 
@@ -149,7 +160,12 @@ class RenderManager extends GrotEngine.RenderManager
                     # set 'onClick' callback
                     widget.setupCallback(@startMove)
 
-        return
+        if @showPreview
+            for x in [0..@board.size*2-1]
+                field = @board.preview.fields[x]
+                [centerX, centerY] = field.getFieldCenter()
+                widget = field.widget
+                widget.relativeMove centerX, centerY
 
     listening: (state) ->
         # toggle listening for event on all field widgets
@@ -246,13 +262,19 @@ class RenderManager extends GrotEngine.RenderManager
 
         if tweens.length > 0
             tweens[0].onFinish = () =>
-                @fillEmptyFields()
+                if @showPreview
+                    @movePreviewToEmptyFields()
+                else
+                    @fillEmptyFields()
                 `this.destroy()`
 
             for tween in tweens
                 tween.play()
         else
-            @fillEmptyFields()
+            if @showPreview
+                @movePreviewToEmptyFields()
+            else
+                @fillEmptyFields()
 
     fillEmptyFields: () ->
         # reset fields in empty places and show them
@@ -261,7 +283,7 @@ class RenderManager extends GrotEngine.RenderManager
             for y in [0..@board.size-1]
                 field = @board.fields[x][y]
                 if field.direction == 'none'
-                    field.resetRandoms()
+                    field.reset()
 
                     # move field to animLayer until animation is finished
                     @moveFieldToLayer(field, @animLayer)
@@ -274,6 +296,93 @@ class RenderManager extends GrotEngine.RenderManager
                             `this.destroy()`
 
         @stage.fire 'onStageUpdated'
+
+        if tweens.length > 0
+            tweens[0].onFinish = () =>
+                @finishMove()
+                `this.destroy()`
+
+            for tween in tweens
+                tween.play()
+        else
+            @finishMove()
+
+    movePreviewToEmptyFields: () ->
+        # move preview field to empty places
+        tweens = []
+        previewIndex = 0
+        for x in [0..@board.size-1]
+            for y in [0..@board.size-1]
+                field = @board.fields[x][y]
+                if field.direction == 'none'
+                    [centerX, centerY] = field.getFieldCenter()
+
+                    previewField = @board.preview.fields[previewIndex]
+                    previewIndex += 1
+                    if previewField?
+                        # move field to animLayer until animation is finished
+                        @moveFieldToLayer(previewField, @animLayer)
+
+                        tweens.push new Kinetic.Tween
+                            node: previewField.widget
+                            x: centerX
+                            y: centerY
+                            scaleX: 2
+                            scaleY: 2
+                            duration: TWEEN_DURATION
+                            onFinish: =>
+                                `this.destroy()`
+
+        # shift rest of preview to the left
+        if previewIndex < @board.size*2-1
+            for x in [previewIndex..@board.size*2-1]
+                previewField = @board.preview.fields[x]
+                destinationField = @board.preview.fields[x-previewIndex]
+                [centerX, centerY] = destinationField.getFieldCenter()
+
+                @moveFieldToLayer(previewField, @animLayer)
+
+                tweens.push new Kinetic.Tween
+                    node: previewField.widget
+                    x: centerX
+                    y: centerY
+                    duration: TWEEN_DURATION
+                    onFinish: =>
+                        `this.destroy()`
+
+        if tweens.length > 0
+            tweens[0].onFinish = () =>
+                @updatePreview()
+                `this.destroy()`
+
+            for tween in tweens
+                tween.play()
+        else
+            @updatePreview()
+
+    updatePreview: () ->
+        # move values and direction from preview to field
+        tweens = []
+
+        for x in [0..@board.size-1]
+            for y in [0..@board.size-1]
+                field = @board.fields[x][y]
+                if field.direction == 'none'
+                    field.reset() # this will destroy preview widget
+                    field.widget.setOpacity 1
+
+        @stage.fire 'onStageUpdated'
+
+        # show new preview fields on the end of preview queue
+        for x in [0..@board.size*2-1]
+            previewField = @board.preview.fields[x]
+            if previewField.widget.getOpacity() == 0
+                tweens.push new Kinetic.Tween
+                    node: previewField.widget
+                    opacity: 1
+                    duration: TWEEN_DURATION
+                    onFinish: =>
+                        `this.destroy()`
 
         if tweens.length > 0
             tweens[0].onFinish = () =>
@@ -326,12 +435,17 @@ class Game extends GrotEngine.Game
     constructor: () ->
         super
 
-        qsSize = parseInt((new QueryString).get('size'))
+        qs = new QueryString
+        qsSize = parseInt(qs.get('size'))
+        qsPreview = qs.get('preview') is 'true'
 
         boardSize = if cfg.customBoardSize and qsSize
         then qsSize else cfg.defaultBoardSize
 
-        @renderManager = new RenderManager boardSize, @
+        showPreview = if cfg.customShowPreview and qsPreview
+        then qsPreview else cfg.showPreview
+
+        @renderManager = new RenderManager boardSize, showPreview, @
 
 
 document.body.style.cssText = 'background-color: ' + cfg.bodyColor + '; margin: 0; padding: 0;'
