@@ -4,6 +4,9 @@ window.cfg =
   ###
   defaultBoardSize: 4
 
+  apiEnabled: false
+  autoPlay: false
+
   baseScale: 1
   baseWindowSize:
     width: 1600
