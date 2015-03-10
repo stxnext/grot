@@ -63,7 +63,9 @@ class RenderManager extends GrotEngine.RenderManager
 
         layers = @stage.getLayers()
         for layer in layers
-            layer.fire('update')
+            layer.fire 'update'
+
+        @stage.fire 'ready'
 
     addLayers: ->
         previewHeight = if @showPreview then cfg.previewHeight else 0
@@ -397,6 +399,7 @@ class RenderManager extends GrotEngine.RenderManager
     gameOver: () ->
         # return message with scored result
         @menuOverlay.fire 'showGameOver', @game.score
+        @stage.fire 'gameOver'
 
     finishMove: () ->
         # update game score
@@ -419,8 +422,10 @@ class RenderManager extends GrotEngine.RenderManager
         if @game.moves > 0
             # reactivate listening
             @listening(true)
+            @stage.fire 'moveCompleted'
         else
             # game over
+            @stage.fire 'moveCompleted'
             @gameOver(@game)
 
 
@@ -431,6 +436,7 @@ class Game extends GrotEngine.Game
     moves: 5
     movesDiff: 0
     renderManager: null
+    api: null
 
     constructor: () ->
         super
@@ -447,6 +453,8 @@ class Game extends GrotEngine.Game
 
         @renderManager = new RenderManager boardSize, showPreview, @
 
+        if cfg.apiEnabled
+            window.api = @api = new Grot.Api @board, @
 
 document.body.style.cssText = 'background-color: ' + cfg.bodyColor + '; margin: 0; padding: 0;'
 window.game = game = new Game()

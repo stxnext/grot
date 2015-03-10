@@ -355,7 +355,6 @@ class Grot.HelpWidget extends GrotEngine.Widget
         super
 
         previewHeight = if @showPreview then cfg.previewHeight else 0
-        console.log previewHeight
         @background = new Kinetic.Rect
             width: 600
             height: 900+previewHeight

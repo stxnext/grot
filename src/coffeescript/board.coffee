@@ -59,6 +59,10 @@ class Grot.FieldWidget extends GrotEngine.Widget
     setupCallback: (@callback) ->
         # setup 'onClick'
         widget = @
+
+        @on 'forcePress', (event) ->
+            widget.callback(widget.field, event)
+
         @on 'mousedown touchstart', (event) ->
             widget.callback(widget.field, event)
 
@@ -208,6 +212,15 @@ class Grot.Board extends GrotEngine.Layer
         @fieldRelativeScale = 4 / @size
         @createPreview()
         @createBoard()
+
+        @on 'arrowPress', @handleArrowPress
+
+    handleArrowPress: (arrowPos) ->
+        x = arrowPos[0] - 1
+        y = arrowPos[1] - 1
+
+        if @fields[x] and @fields[x][y]
+            @fields[x][y].widget.fire 'forcePress'
 
     createBoard: () ->
         # create size x size board, calculate initial value of fields
