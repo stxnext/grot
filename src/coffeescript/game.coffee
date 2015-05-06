@@ -1,6 +1,6 @@
 # GROT - html5 canvas game
 
-window.TWEEN_DURATION = cfg.tweenDuration
+window.TWEEN_DURATION = (10 - cfg.defaultSpeed) * cfg.tweenDurationUnit
 window.delay1s = (func) -> setTimeout func, 1000
 
 window.randomChoice = (values) ->
@@ -202,7 +202,7 @@ class RenderManager extends GrotEngine.RenderManager
 
         tween = new Kinetic.Tween
             node: startField.widget
-            duration: TWEEN_DURATION
+            duration: window.TWEEN_DURATION
             x: centerX
             y: centerY
             opacity: 0
@@ -256,7 +256,7 @@ class RenderManager extends GrotEngine.RenderManager
                         tweens.push new Kinetic.Tween
                             node: field.widget
                             easing: Kinetic.Easings.BounceEaseOut,
-                            duration: TWEEN_DURATION
+                            duration: window.TWEEN_DURATION
                             x: centerX
                             y: centerY
                             onFinish: =>
@@ -293,7 +293,7 @@ class RenderManager extends GrotEngine.RenderManager
                     tweens.push new Kinetic.Tween
                         node: field.widget
                         opacity: 1
-                        duration: TWEEN_DURATION
+                        duration: window.TWEEN_DURATION
                         onFinish: =>
                             `this.destroy()`
 
@@ -331,7 +331,7 @@ class RenderManager extends GrotEngine.RenderManager
                             y: centerY
                             scaleX: 2
                             scaleY: 2
-                            duration: TWEEN_DURATION
+                            duration: window.TWEEN_DURATION
                             onFinish: =>
                                 `this.destroy()`
 
@@ -348,7 +348,7 @@ class RenderManager extends GrotEngine.RenderManager
                     node: previewField.widget
                     x: centerX
                     y: centerY
-                    duration: TWEEN_DURATION
+                    duration: window.TWEEN_DURATION
                     onFinish: =>
                         `this.destroy()`
 
@@ -382,7 +382,7 @@ class RenderManager extends GrotEngine.RenderManager
                 tweens.push new Kinetic.Tween
                     node: previewField.widget
                     opacity: 1
-                    duration: TWEEN_DURATION
+                    duration: window.TWEEN_DURATION
                     onFinish: =>
                         `this.destroy()`
 
@@ -444,12 +444,17 @@ class Game extends GrotEngine.Game
         qs = new QueryString
         qsSize = parseInt(qs.get('size'))
         qsPreview = qs.get('preview') is 'true'
+        qsSpeed = parseInt(qs.get('speed'))
 
         boardSize = if cfg.customBoardSize and qsSize
         then qsSize else cfg.defaultBoardSize
 
         showPreview = if cfg.customShowPreview and qsPreview
         then qsPreview else cfg.showPreview
+
+        speed = if cfg.customSpeed and qsSpeed and qsSpeed > 0 and qsSpeed < 10
+        then qsSpeed else cfg.defaultSpeed
+        window.TWEEN_DURATION = (10 - speed) * cfg.tweenDurationUnit
 
         @renderManager = new RenderManager boardSize, showPreview, @
 

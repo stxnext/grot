@@ -50,9 +50,15 @@ window.cfg =
   arrowColor: '#ffffff'
 
   ###
-  Tween duration
+  Tween duration settings
+
+  Enables or disables possibility to pass
+  ?speed=1..9 param to configure animation speed
   ###
-  tweenDuration: 0.5
+  customSpeed: true
+
+  defaultSpeed: 5
+  tweenDurationUnit: 0.1
 
   ###
   Font settings

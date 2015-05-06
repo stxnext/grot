@@ -1,4 +1,3 @@
-TWEEN_DURATION = cfg.tweenDuration
 
 class Grot.TopBarWidget extends GrotEngine.Widget
     # Top bar which displays current game stats
@@ -104,7 +103,7 @@ class Grot.TopBarWidget extends GrotEngine.Widget
             tween = new Kinetic.Tween
                 node: diff
                 opacity: 0
-                duration: TWEEN_DURATION
+                duration: window.TWEEN_DURATION
                 onFinish: ->
                     @destroy()
 
